@@ -1,0 +1,55 @@
+version: '3.8'
+
+services:
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: gov-backend
+    restart: always
+    env_file: ./backend/.env
+    environment:
+      NODE_ENV: production
+      DATABASE_CLIENT: sqlite
+      DATABASE_FILENAME: .tmp/data.db
+    volumes:
+      - ./backend/.tmp:/opt/app/.tmp
+      - ./backend/public/uploads:/opt/app/public/uploads
+    ports:
+      - "1337:1337"
+    networks:
+      - my_cms_net
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+      args:
+        # Build-time: try to get URLs from .env, otherwise fallback to localhost
+        NEXT_PUBLIC_STRAPI_URL: ${NEXT_PUBLIC_STRAPI_URL:-http://localhost:1337}
+        NEXT_PUBLIC_DATAGOV_URL: ${NEXT_PUBLIC_DATAGOV_URL:-http://localhost:3002}
+        NEXT_PUBLIC_PDPA_URL: ${NEXT_PUBLIC_PDPA_URL:-http://localhost:3004}
+    container_name: gov-frontend
+    restart: always
+    environment:
+      NODE_ENV: production
+      # Server-side calls go through Docker internal DNS (no IP needed)
+      STRAPI_URL: http://backend:1337
+      # Runtime detection in browser handles public URLs automatically
+      # These are now also dynamically linked to host .env for SSR correctness
+      NEXT_PUBLIC_STRAPI_URL: ${NEXT_PUBLIC_STRAPI_URL:-http://localhost:1337}
+      NEXT_PUBLIC_DATAGOV_URL: ${NEXT_PUBLIC_DATAGOV_URL:-http://localhost:3002}
+      NEXT_PUBLIC_PDPA_URL: ${NEXT_PUBLIC_PDPA_URL:-http://localhost:3004}
+      # Strapi API token
+      STRAPI_API_TOKEN: 5dc960f1ba3a6554ba334a6e3e218363869ad7c98315410833d95838d2782c7b930a2af945bcfc678aae98a78378119b90be49da03fa93d3089043d6b32dfec9fb9edf46e439c9267cfed316ba44c406b1b36419f913719334d33a80be2623d3e0ae75cb08594cacad5fa39bb310a0b26d2eb5ec6c4cef73202835209899607a
+    ports:
+      - "3002:3000"
+      - "3004:3000"
+    depends_on:
+      - backend
+    networks:
+      - my_cms_net
+
+networks:
+  my_cms_net:
+    driver: bridge

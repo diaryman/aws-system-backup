@@ -1,0 +1,494 @@
+{
+  "us-east-1": {
+    "vpcs": {
+      "Vpcs": [
+        {
+          "OwnerId": "591671455886",
+          "InstanceTenancy": "default",
+          "CidrBlockAssociationSet": [
+            {
+              "AssociationId": "vpc-cidr-assoc-026dc859b40c57ac7",
+              "CidrBlock": "172.31.0.0/16",
+              "CidrBlockState": {
+                "State": "associated"
+              }
+            }
+          ],
+          "IsDefault": true,
+          "BlockPublicAccessStates": {
+            "InternetGatewayBlockMode": "off"
+          },
+          "VpcId": "vpc-09b3b9e0104f95fa9",
+          "State": "available",
+          "CidrBlock": "172.31.0.0/16",
+          "DhcpOptionsId": "dopt-02deb8976320ece7c"
+        }
+      ],
+      "ResponseMetadata": {
+        "RequestId": "ba228586-1397-40ea-b680-83f1afbe45be",
+        "HTTPStatusCode": 200,
+        "HTTPHeaders": {
+          "x-amzn-requestid": "ba228586-1397-40ea-b680-83f1afbe45be",
+          "cache-control": "no-cache, no-store",
+          "strict-transport-security": "max-age=31536000; includeSubDomains",
+          "content-type": "text/xml;charset=UTF-8",
+          "content-length": "799",
+          "date": "Tue, 01 Sep 2026 10:17:44 GMT",
+          "server": "AmazonEC2"
+        },
+        "RetryAttempts": 0
+      }
+    },
+    "subnets": {
+      "Subnets": [
+        {
+          "AvailabilityZoneId": "use1-az6",
+          "MapCustomerOwnedIpOnLaunch": false,
+          "OwnerId": "591671455886",
+          "AssignIpv6AddressOnCreation": false,
+          "Ipv6CidrBlockAssociationSet": [],
+          "SubnetArn": "arn:aws:ec2:us-east-1:591671455886:subnet/subnet-05625e99b2c74b968",
+          "EnableDns64": false,
+          "Ipv6Native": false,
+          "PrivateDnsNameOptionsOnLaunch": {
+            "HostnameType": "ip-name",
+            "EnableResourceNameDnsARecord": false,
+            "EnableResourceNameDnsAAAARecord": false
+          },
+          "BlockPublicAccessStates": {
+            "InternetGatewayBlockMode": "off"
+          },
+          "SubnetId": "subnet-05625e99b2c74b968",
+          "State": "available",
+          "VpcId": "vpc-09b3b9e0104f95fa9",
+          "CidrBlock": "172.31.32.0/20",
+          "AvailableIpAddressCount": 4090,
+          "AvailabilityZone": "us-east-1c",
+          "DefaultForAz": true,
+          "MapPublicIpOnLaunch": true
+        },
+        {
+          "AvailabilityZoneId": "use1-az4",
+          "MapCustomerOwnedIpOnLaunch": false,
+          "OwnerId": "591671455886",
+          "AssignIpv6AddressOnCreation": false,
+          "Ipv6CidrBlockAssociationSet": [],
+          "SubnetArn": "arn:aws:ec2:us-east-1:591671455886:subnet/subnet-07d150a83aa6e3224",
+          "EnableDns64": false,
+          "Ipv6Native": false,
+          "PrivateDnsNameOptionsOnLaunch": {
+            "HostnameType": "ip-name",
+            "EnableResourceNameDnsARecord": false,
+            "EnableResourceNameDnsAAAARecord": false
+          },
+          "BlockPublicAccessStates": {
+            "InternetGatewayBlockMode": "off"
+          },
+          "SubnetId": "subnet-07d150a83aa6e3224",
+          "State": "available",
+          "VpcId": "vpc-09b3b9e0104f95fa9",
+          "CidrBlock": "172.31.16.0/20",
+          "AvailableIpAddressCount": 4089,
+          "AvailabilityZone": "us-east-1b",
+          "DefaultForAz": true,
+          "MapPublicIpOnLaunch": true
+        },
+        {
+          "AvailabilityZoneId": "use1-az2",
+          "MapCustomerOwnedIpOnLaunch": false,
+          "OwnerId": "591671455886",
+          "AssignIpv6AddressOnCreation": false,
+          "Ipv6CidrBlockAssociationSet": [],
+          "SubnetArn": "arn:aws:ec2:us-east-1:591671455886:subnet/subnet-00e5d4d9ca8b984e4",
+          "EnableDns64": false,
+          "Ipv6Native": false,
+          "PrivateDnsNameOptionsOnLaunch": {
+            "HostnameType": "ip-name",
+            "EnableResourceNameDnsARecord": false,
+            "EnableResourceNameDnsAAAARecord": false
+          },
+          "BlockPublicAccessStates": {
+            "InternetGatewayBlockMode": "off"
+          },
+          "SubnetId": "subnet-00e5d4d9ca8b984e4",
+          "State": "available",
+          "VpcId": "vpc-09b3b9e0104f95fa9",
+          "CidrBlock": "172.31.80.0/20",
+          "AvailableIpAddressCount": 4090,
+          "AvailabilityZone": "us-east-1a",
+          "DefaultForAz": true,
+          "MapPublicIpOnLaunch": true
+        },
+        {
+          "AvailabilityZoneId": "use1-az1",
+          "MapCustomerOwnedIpOnLaunch": false,
+          "OwnerId": "591671455886",
+          "AssignIpv6AddressOnCreation": false,
+          "Ipv6CidrBlockAssociationSet": [],
+          "SubnetArn": "arn:aws:ec2:us-east-1:591671455886:subnet/subnet-0d677fd72761a6c0f",
+          "EnableDns64": false,
+          "Ipv6Native": false,
+          "PrivateDnsNameOptionsOnLaunch": {
+            "HostnameType": "ip-name",
+            "EnableResourceNameDnsARecord": false,
+            "EnableResourceNameDnsAAAARecord": false
+          },
+          "BlockPublicAccessStates": {
+            "InternetGatewayBlockMode": "off"
+          },
+          "SubnetId": "subnet-0d677fd72761a6c0f",
+          "State": "available",
+          "VpcId": "vpc-09b3b9e0104f95fa9",
+          "CidrBlock": "172.31.0.0/20",
+          "AvailableIpAddressCount": 4091,
+          "AvailabilityZone": "us-east-1d",
+          "DefaultForAz": true,
+          "MapPublicIpOnLaunch": true
+        },
+        {
+          "AvailabilityZoneId": "use1-az3",
+          "MapCustomerOwnedIpOnLaunch": false,
+          "OwnerId": "591671455886",
+          "AssignIpv6AddressOnCreation": false,
+          "Ipv6CidrBlockAssociationSet": [],
+          "SubnetArn": "arn:aws:ec2:us-east-1:591671455886:subnet/subnet-0d9625cd5002a7167",
+          "EnableDns64": false,
+          "Ipv6Native": false,
+          "PrivateDnsNameOptionsOnLaunch": {
+            "HostnameType": "ip-name",
+            "EnableResourceNameDnsARecord": false,
+            "EnableResourceNameDnsAAAARecord": false
+          },
+          "BlockPublicAccessStates": {
+            "InternetGatewayBlockMode": "off"
+          },
+          "SubnetId": "subnet-0d9625cd5002a7167",
+          "State": "available",
+          "VpcId": "vpc-09b3b9e0104f95fa9",
+          "CidrBlock": "172.31.48.0/20",
+          "AvailableIpAddressCount": 4091,
+          "AvailabilityZone": "us-east-1e",
+          "DefaultForAz": true,
+          "MapPublicIpOnLaunch": true
+        },
+        {
+          "AvailabilityZoneId": "use1-az5",
+          "MapCustomerOwnedIpOnLaunch": false,
+          "OwnerId": "591671455886",
+          "AssignIpv6AddressOnCreation": false,
+          "Ipv6CidrBlockAssociationSet": [],
+          "SubnetArn": "arn:aws:ec2:us-east-1:591671455886:subnet/subnet-0165b9f6c233bd5b3",
+          "EnableDns64": false,
+          "Ipv6Native": false,
+          "PrivateDnsNameOptionsOnLaunch": {
+            "HostnameType": "ip-name",
+            "EnableResourceNameDnsARecord": false,
+            "EnableResourceNameDnsAAAARecord": false
+          },
+          "BlockPublicAccessStates": {
+            "InternetGatewayBlockMode": "off"
+          },
+          "SubnetId": "subnet-0165b9f6c233bd5b3",
+          "State": "available",
+          "VpcId": "vpc-09b3b9e0104f95fa9",
+          "CidrBlock": "172.31.64.0/20",
+          "AvailableIpAddressCount": 4090,
+          "AvailabilityZone": "us-east-1f",
+          "DefaultForAz": true,
+          "MapPublicIpOnLaunch": true
+        }
+      ],
+      "ResponseMetadata": {
+        "RequestId": "4ec635ec-e8b7-40c6-b696-654a81ef97bf",
+        "HTTPStatusCode": 200,
+        "HTTPHeaders": {
+          "x-amzn-requestid": "4ec635ec-e8b7-40c6-b696-654a81ef97bf",
+          "cache-control": "no-cache, no-store",
+          "strict-transport-security": "max-age=31536000; includeSubDomains",
+          "vary": "accept-encoding",
+          "content-type": "text/xml;charset=UTF-8",
+          "content-length": "6628",
+          "date": "Tue, 01 Sep 2026 10:17:44 GMT",
+          "server": "AmazonEC2"
+        },
+        "RetryAttempts": 0
+      }
+    }
+  },
+  "ap-southeast-7": {
+    "vpcs": {
+      "Vpcs": [
+        {
+          "OwnerId": "591671455886",
+          "InstanceTenancy": "default",
+          "CidrBlockAssociationSet": [
+            {
+              "AssociationId": "vpc-cidr-assoc-0107cf6e1b6b08a44",
+              "CidrBlock": "172.31.0.0/16",
+              "CidrBlockState": {
+                "State": "associated"
+              }
+            }
+          ],
+          "IsDefault": true,
+          "BlockPublicAccessStates": {
+            "InternetGatewayBlockMode": "off"
+          },
+          "VpcId": "vpc-0d41e604f95be431e",
+          "State": "available",
+          "CidrBlock": "172.31.0.0/16",
+          "DhcpOptionsId": "dopt-0f1b30435d504c726"
+        }
+      ],
+      "ResponseMetadata": {
+        "RequestId": "0669ef6a-7c07-4f10-9876-22627a108e8d",
+        "HTTPStatusCode": 200,
+        "HTTPHeaders": {
+          "x-amzn-requestid": "0669ef6a-7c07-4f10-9876-22627a108e8d",
+          "cache-control": "no-cache, no-store",
+          "strict-transport-security": "max-age=31536000; includeSubDomains",
+          "content-type": "text/xml;charset=UTF-8",
+          "content-length": "799",
+          "date": "Tue, 01 Sep 2026 10:17:45 GMT",
+          "server": "AmazonEC2"
+        },
+        "RetryAttempts": 0
+      }
+    },
+    "subnets": {
+      "Subnets": [
+        {
+          "AvailabilityZoneId": "apse7-az1",
+          "MapCustomerOwnedIpOnLaunch": false,
+          "OwnerId": "591671455886",
+          "AssignIpv6AddressOnCreation": false,
+          "Ipv6CidrBlockAssociationSet": [],
+          "SubnetArn": "arn:aws:ec2:ap-southeast-7:591671455886:subnet/subnet-02b91c9e749fc0a9b",
+          "EnableDns64": false,
+          "Ipv6Native": false,
+          "PrivateDnsNameOptionsOnLaunch": {
+            "HostnameType": "ip-name",
+            "EnableResourceNameDnsARecord": false,
+            "EnableResourceNameDnsAAAARecord": false
+          },
+          "BlockPublicAccessStates": {
+            "InternetGatewayBlockMode": "off"
+          },
+          "SubnetId": "subnet-02b91c9e749fc0a9b",
+          "State": "available",
+          "VpcId": "vpc-0d41e604f95be431e",
+          "CidrBlock": "172.31.16.0/20",
+          "AvailableIpAddressCount": 4091,
+          "AvailabilityZone": "ap-southeast-7a",
+          "DefaultForAz": true,
+          "MapPublicIpOnLaunch": true
+        },
+        {
+          "AvailabilityZoneId": "apse7-az2",
+          "MapCustomerOwnedIpOnLaunch": false,
+          "OwnerId": "591671455886",
+          "AssignIpv6AddressOnCreation": false,
+          "Ipv6CidrBlockAssociationSet": [],
+          "SubnetArn": "arn:aws:ec2:ap-southeast-7:591671455886:subnet/subnet-0da8c052d42c3e9e5",
+          "EnableDns64": false,
+          "Ipv6Native": false,
+          "PrivateDnsNameOptionsOnLaunch": {
+            "HostnameType": "ip-name",
+            "EnableResourceNameDnsARecord": false,
+            "EnableResourceNameDnsAAAARecord": false
+          },
+          "BlockPublicAccessStates": {
+            "InternetGatewayBlockMode": "off"
+          },
+          "SubnetId": "subnet-0da8c052d42c3e9e5",
+          "State": "available",
+          "VpcId": "vpc-0d41e604f95be431e",
+          "CidrBlock": "172.31.0.0/20",
+          "AvailableIpAddressCount": 4091,
+          "AvailabilityZone": "ap-southeast-7b",
+          "DefaultForAz": true,
+          "MapPublicIpOnLaunch": true
+        },
+        {
+          "AvailabilityZoneId": "apse7-az3",
+          "MapCustomerOwnedIpOnLaunch": false,
+          "OwnerId": "591671455886",
+          "AssignIpv6AddressOnCreation": false,
+          "Ipv6CidrBlockAssociationSet": [],
+          "SubnetArn": "arn:aws:ec2:ap-southeast-7:591671455886:subnet/subnet-07ee6018e69699f9e",
+          "EnableDns64": false,
+          "Ipv6Native": false,
+          "PrivateDnsNameOptionsOnLaunch": {
+            "HostnameType": "ip-name",
+            "EnableResourceNameDnsARecord": false,
+            "EnableResourceNameDnsAAAARecord": false
+          },
+          "BlockPublicAccessStates": {
+            "InternetGatewayBlockMode": "off"
+          },
+          "SubnetId": "subnet-07ee6018e69699f9e",
+          "State": "available",
+          "VpcId": "vpc-0d41e604f95be431e",
+          "CidrBlock": "172.31.32.0/20",
+          "AvailableIpAddressCount": 4090,
+          "AvailabilityZone": "ap-southeast-7c",
+          "DefaultForAz": true,
+          "MapPublicIpOnLaunch": true
+        }
+      ],
+      "ResponseMetadata": {
+        "RequestId": "305ab9b6-1e05-48fc-9085-c0005349ef35",
+        "HTTPStatusCode": 200,
+        "HTTPHeaders": {
+          "x-amzn-requestid": "305ab9b6-1e05-48fc-9085-c0005349ef35",
+          "cache-control": "no-cache, no-store",
+          "strict-transport-security": "max-age=31536000; includeSubDomains",
+          "vary": "accept-encoding",
+          "content-type": "text/xml;charset=UTF-8",
+          "content-length": "3457",
+          "date": "Tue, 01 Sep 2026 10:17:45 GMT",
+          "server": "AmazonEC2"
+        },
+        "RetryAttempts": 0
+      }
+    }
+  },
+  "ap-southeast-1": {
+    "vpcs": {
+      "Vpcs": [
+        {
+          "OwnerId": "591671455886",
+          "InstanceTenancy": "default",
+          "CidrBlockAssociationSet": [
+            {
+              "AssociationId": "vpc-cidr-assoc-0ed6e636db3f23b21",
+              "CidrBlock": "172.31.0.0/16",
+              "CidrBlockState": {
+                "State": "associated"
+              }
+            }
+          ],
+          "IsDefault": true,
+          "BlockPublicAccessStates": {
+            "InternetGatewayBlockMode": "off"
+          },
+          "VpcId": "vpc-05d8facf78b2ac008",
+          "State": "available",
+          "CidrBlock": "172.31.0.0/16",
+          "DhcpOptionsId": "dopt-0c57087a0485010fc"
+        }
+      ],
+      "ResponseMetadata": {
+        "RequestId": "dd1e33f8-9a27-4dee-97d8-c116fc2fdfc7",
+        "HTTPStatusCode": 200,
+        "HTTPHeaders": {
+          "x-amzn-requestid": "dd1e33f8-9a27-4dee-97d8-c116fc2fdfc7",
+          "cache-control": "no-cache, no-store",
+          "strict-transport-security": "max-age=31536000; includeSubDomains",
+          "content-type": "text/xml;charset=UTF-8",
+          "content-length": "799",
+          "date": "Tue, 01 Sep 2026 10:17:45 GMT",
+          "server": "AmazonEC2"
+        },
+        "RetryAttempts": 0
+      }
+    },
+    "subnets": {
+      "Subnets": [
+        {
+          "AvailabilityZoneId": "apse1-az1",
+          "MapCustomerOwnedIpOnLaunch": false,
+          "OwnerId": "591671455886",
+          "AssignIpv6AddressOnCreation": false,
+          "Ipv6CidrBlockAssociationSet": [],
+          "SubnetArn": "arn:aws:ec2:ap-southeast-1:591671455886:subnet/subnet-01f725d7a823f1aa2",
+          "EnableDns64": false,
+          "Ipv6Native": false,
+          "PrivateDnsNameOptionsOnLaunch": {
+            "HostnameType": "ip-name",
+            "EnableResourceNameDnsARecord": false,
+            "EnableResourceNameDnsAAAARecord": false
+          },
+          "BlockPublicAccessStates": {
+            "InternetGatewayBlockMode": "off"
+          },
+          "SubnetId": "subnet-01f725d7a823f1aa2",
+          "State": "available",
+          "VpcId": "vpc-05d8facf78b2ac008",
+          "CidrBlock": "172.31.16.0/20",
+          "AvailableIpAddressCount": 4091,
+          "AvailabilityZone": "ap-southeast-1a",
+          "DefaultForAz": true,
+          "MapPublicIpOnLaunch": true
+        },
+        {
+          "AvailabilityZoneId": "apse1-az2",
+          "MapCustomerOwnedIpOnLaunch": false,
+          "OwnerId": "591671455886",
+          "AssignIpv6AddressOnCreation": false,
+          "Ipv6CidrBlockAssociationSet": [],
+          "SubnetArn": "arn:aws:ec2:ap-southeast-1:591671455886:subnet/subnet-050ef601a258d3624",
+          "EnableDns64": false,
+          "Ipv6Native": false,
+          "PrivateDnsNameOptionsOnLaunch": {
+            "HostnameType": "ip-name",
+            "EnableResourceNameDnsARecord": false,
+            "EnableResourceNameDnsAAAARecord": false
+          },
+          "BlockPublicAccessStates": {
+            "InternetGatewayBlockMode": "off"
+          },
+          "SubnetId": "subnet-050ef601a258d3624",
+          "State": "available",
+          "VpcId": "vpc-05d8facf78b2ac008",
+          "CidrBlock": "172.31.32.0/20",
+          "AvailableIpAddressCount": 4091,
+          "AvailabilityZone": "ap-southeast-1b",
+          "DefaultForAz": true,
+          "MapPublicIpOnLaunch": true
+        },
+        {
+          "AvailabilityZoneId": "apse1-az3",
+          "MapCustomerOwnedIpOnLaunch": false,
+          "OwnerId": "591671455886",
+          "AssignIpv6AddressOnCreation": false,
+          "Ipv6CidrBlockAssociationSet": [],
+          "SubnetArn": "arn:aws:ec2:ap-southeast-1:591671455886:subnet/subnet-0e600cc6ad68bd342",
+          "EnableDns64": false,
+          "Ipv6Native": false,
+          "PrivateDnsNameOptionsOnLaunch": {
+            "HostnameType": "ip-name",
+            "EnableResourceNameDnsARecord": false,
+            "EnableResourceNameDnsAAAARecord": false
+          },
+          "BlockPublicAccessStates": {
+            "InternetGatewayBlockMode": "off"
+          },
+          "SubnetId": "subnet-0e600cc6ad68bd342",
+          "State": "available",
+          "VpcId": "vpc-05d8facf78b2ac008",
+          "CidrBlock": "172.31.0.0/20",
+          "AvailableIpAddressCount": 4091,
+          "AvailabilityZone": "ap-southeast-1c",
+          "DefaultForAz": true,
+          "MapPublicIpOnLaunch": true
+        }
+      ],
+      "ResponseMetadata": {
+        "RequestId": "4d8a9230-8aae-41be-8dc3-0d9d83993990",
+        "HTTPStatusCode": 200,
+        "HTTPHeaders": {
+          "x-amzn-requestid": "4d8a9230-8aae-41be-8dc3-0d9d83993990",
+          "cache-control": "no-cache, no-store",
+          "strict-transport-security": "max-age=31536000; includeSubDomains",
+          "vary": "accept-encoding",
+          "content-type": "text/xml;charset=UTF-8",
+          "content-length": "3457",
+          "date": "Tue, 01 Sep 2026 10:17:45 GMT",
+          "server": "AmazonEC2"
+        },
+        "RetryAttempts": 0
+      }
+    }
+  }
+}

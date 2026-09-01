@@ -1,0 +1,50 @@
+{
+    "kind": "collectionType",
+    "collectionName": "hero_slides",
+    "info": {
+        "singularName": "hero-slide",
+        "pluralName": "hero-slides",
+        "displayName": "Hero Slide",
+        "description": "Dynamic slides for the home page hero section"
+    },
+    "options": {
+        "draftAndPublish": true
+    },
+    "attributes": {
+        "title": {
+            "type": "string",
+            "required": true
+        },
+        "subtitle": {
+            "type": "text"
+        },
+        "image": {
+            "type": "media",
+            "multiple": false,
+            "required": true,
+            "allowedTypes": [
+                "images"
+            ]
+        },
+        "buttonText": {
+            "type": "string",
+            "default": "อ่านเพิ่มเติม"
+        },
+        "buttonLink": {
+            "type": "string",
+            "default": "/"
+        },
+        "displayOrder": {
+            "type": "integer",
+            "default": 0
+        },
+        "domain": {
+            "type": "string",
+            "required": true
+        },
+        "isActive": {
+            "type": "boolean",
+            "default": true
+        }
+    }
+}

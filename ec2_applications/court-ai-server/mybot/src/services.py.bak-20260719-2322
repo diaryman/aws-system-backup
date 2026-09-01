@@ -1,0 +1,397 @@
+import boto3
+from openai import OpenAI
+import google.generativeai as genai
+import sqlite3
+import json
+import time
+import pandas as pd
+import os
+from datetime import datetime
+import streamlit as st
+
+from src.config import REGION, MODELS, SYSTEM_PROMPT, THB_RATE, MODEL_PRICING, SHEET_NAME
+from src.utils import load_secret
+
+# Initialize Secrets
+AWS_ACCESS_KEY = load_secret("AWS_ACCESS_KEY")
+AWS_SECRET_KEY = load_secret("AWS_SECRET_KEY")
+DEEPSEEK_API_KEY = load_secret("DEEPSEEK_API_KEY")
+GEMINI_API_KEY = load_secret("GEMINI_API_KEY")
+
+if GEMINI_API_KEY:
+    genai.configure(api_key=GEMINI_API_KEY)
+
+# ==========================================
+# 🔌 CLIENT FACTORIES
+# ==========================================
+
+@st.cache_resource
+def get_aws_runtime():
+    if not AWS_ACCESS_KEY: return None
+    return boto3.client(
+        'bedrock-runtime', 
+        region_name=REGION, 
+        aws_access_key_id=AWS_ACCESS_KEY, 
+        aws_secret_access_key=AWS_SECRET_KEY
+    )
+
+@st.cache_resource
+def get_aws_agent():
+    if not AWS_ACCESS_KEY: return None
+    return boto3.client(
+        'bedrock-agent-runtime', 
+        region_name=REGION, 
+        aws_access_key_id=AWS_ACCESS_KEY, 
+        aws_secret_access_key=AWS_SECRET_KEY
+    )
+
+# ==========================================
+# 🗄️ DATABASE CONNECTION
+# ==========================================
+
+DB_PATH = "data/logs.db"
+
+def init_db():
+    """Initializes the SQLite database and creates the logs table if it doesn't exist."""
+    if not os.path.exists("data"):
+        os.makedirs("data")
+        
+    conn = sqlite3.connect(DB_PATH)
+    cursor = conn.cursor()
+    cursor.execute("""
+        CREATE TABLE IF NOT EXISTS logs (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            timestamp TEXT,
+            username TEXT,
+            question TEXT,
+            kb_left TEXT,
+            model_left TEXT,
+            answer_left TEXT,
+            feedback_left TEXT,
+            cost_left REAL,
+            time_left REAL,
+            kb_right TEXT,
+            model_right TEXT,
+            answer_right TEXT,
+            feedback_right TEXT,
+            cost_right REAL,
+            time_right REAL
+        )
+    """)
+    conn.commit()
+    conn.close()
+
+# Run initialization
+init_db()
+
+def get_db_connection():
+    return sqlite3.connect(DB_PATH)
+
+# ==========================================
+# 🧠 LOGIC FUNCTIONS
+# ==========================================
+
+def retrieve_context(query, kb_id):
+    """Retrieves relevant context from AWS Bedrock Knowledge Base."""
+    if not kb_id: 
+        return "", {}
+    
+    agent = get_aws_agent()
+    if not agent: 
+        return "", {}
+
+    # Query Expansion Rule for court count questions
+    query_lower = query.lower()
+    is_court_query = "ศาลปกครอง" in query_lower
+    is_count_query = any(k in query_lower for k in ["กี่แห่ง", "มีกี่", "กี่ที่", "จำนวน", "ทั้งหมด"])
+    
+    if is_court_query and is_count_query:
+        query = query + " ศาลปกครองในประเทศไทยเปิดทำการแล้วทั้งสิ้น 16 แห่ง ศาลปกครองสูงสุด 1 แห่ง ศาลปกครองชั้นต้น 15 แห่ง ศาลปกครองกลาง 1 แห่ง และศาลปกครองภูมิภาค 14 แห่ง"
+
+    try:
+        res = agent.retrieve(
+            knowledgeBaseId=kb_id, 
+            retrievalQuery={'text': query}, 
+            retrievalConfiguration={'vectorSearchConfiguration': {'numberOfResults': 10}}
+        )
+        ctx = ""
+        citation_details = {}
+        
+        if 'retrievalResults' in res:
+            for r in res['retrievalResults']:
+                text_chunk = r['content']['text']
+                ctx += f"- {text_chunk}\n"
+                
+                # Extract filename safely
+                uri = r.get('location', {}).get('s3Location', {}).get('uri', 'Unknown')
+                fname = uri.split('/')[-1]
+                
+                if fname not in citation_details:
+                    citation_details[fname] = text_chunk[:200].replace('\n', ' ') + "..."
+                    
+        return ctx, citation_details
+    except Exception as e: 
+        print(f"KB Error ({kb_id}): {e}")
+        return "", {}
+
+def calculate_cost(model_id, full_text_in, full_text_out):
+    """Estimates cost in THB."""
+    pricing = MODEL_PRICING.get(model_id, [0, 0])
+    in_tokens = len(full_text_in) / 3.0 
+    out_tokens = len(full_text_out) / 3.0
+    cost = (in_tokens/1e6 * pricing[0]) + (out_tokens/1e6 * pricing[1])
+    return cost * THB_RATE
+
+def call_single_model(model_name, prompt, context, citations_dict, temperature=0.5, placeholder=None, system_instruction=None, q=None):
+    """Invokes a single AI model, optionally streaming output to a placeholder or queue."""
+    cfg = MODELS[model_name]
+    
+    # Use custom system instruction if provided, else default
+    sys_prompt = system_instruction if system_instruction else SYSTEM_PROMPT
+    full_input = f"{sys_prompt}\n\nContext:\n{context}\n\nUser Question: {prompt}"
+    
+    answer = ""
+    start_time = time.time()
+    
+    try:
+        # --- BEDROCK ---
+        if cfg["type"] == "bedrock":
+            runtime = get_aws_runtime()
+            if not runtime: raise ValueError("AWS Credentials missing")
+            
+            messages = [{"role": "user", "content": [{"text": full_input}]}]
+            inf_config = {"maxTokens": 2048, "temperature": temperature}
+            
+            if placeholder or q:
+                response = runtime.converse_stream(
+                    modelId=cfg["id"],
+                    messages=messages,
+                    inferenceConfig=inf_config
+                )
+                stream = response.get('stream')
+                if stream:
+                    for event in stream:
+                        if 'contentBlockDelta' in event:
+                            text_chunk = event['contentBlockDelta']['delta']['text']
+                            answer += text_chunk
+                            if placeholder: placeholder.markdown(answer + "▌")
+                            if q: q.put(text_chunk)
+                if placeholder: placeholder.markdown(answer)
+            else:
+                response = runtime.converse(
+                    modelId=cfg["id"],
+                    messages=messages,
+                    inferenceConfig=inf_config
+                )
+                answer = response['output']['message']['content'][0]['text']
+
+        # --- DEEPSEEK & SELF-HOSTED ---
+        elif cfg["type"] in ["deepseek", "deepseek_self_hosted"]:
+            if cfg["type"] == "deepseek":
+                client = get_deepseek_client()
+            else:
+                 # Hardcoded IP needs to be verified or moved to config if dynamic
+                client = OpenAI(base_url="http://3.235.65.4:11434/v1", api_key="ollama", timeout=120.0)
+            
+            if not client: raise ValueError("Client not initialized")
+            
+            if placeholder:
+                stream = client.chat.completions.create(
+                    model=cfg["id"], temperature=temperature,
+                    messages=[{"role": "user", "content": full_input}],
+                    stream=True
+                )
+                for chunk in stream:
+                    if chunk.choices[0].delta.content is not None:
+                        text_chunk = chunk.choices[0].delta.content
+                        answer += text_chunk
+                        if placeholder: placeholder.markdown(answer + "▌")
+                        if q: q.put(text_chunk)
+                if placeholder: placeholder.markdown(answer)
+            else:
+                res = client.chat.completions.create(
+                    model=cfg["id"], temperature=temperature,
+                    messages=[{"role": "user", "content": full_input}]
+                )
+                answer = res.choices[0].message.content
+
+        # --- GEMINI ---
+        elif cfg["type"] == "gemini":
+            if not GEMINI_API_KEY: raise ValueError("Gemini Key missing")
+            gen_cfg = genai.GenerationConfig(temperature=temperature)
+            model = genai.GenerativeModel(cfg["id"])
+            
+            if placeholder or q:
+                response = model.generate_content(full_input, generation_config=gen_cfg, stream=True)
+                for chunk in response:
+                    text_chunk = chunk.text
+                    answer += text_chunk
+                    if placeholder: placeholder.markdown(answer + "▌")
+                    if q: q.put(text_chunk)
+                if placeholder: placeholder.markdown(answer)
+            else:
+                answer = model.generate_content(full_input, generation_config=gen_cfg).text
+            
+    except Exception as e:
+        answer = f"⚠️ Error: {str(e)}"
+        if placeholder: placeholder.error(answer)
+        if q: q.put(answer)
+        
+    finally:
+        if q: q.put(None)
+    
+    elapsed = time.time() - start_time
+    
+    return {
+        "model": model_name, 
+        "answer": answer, 
+        "citations": citations_dict, 
+        "cost": calculate_cost(cfg["id"], full_input, answer), 
+        "config": cfg, 
+        "time": elapsed
+    }
+
+def save_to_sheet(username, q, r_left, r_right, kb_left="", kb_right=""):
+    try:
+        conn = get_db_connection()
+        cursor = conn.cursor()
+        
+        timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        
+        cursor.execute("""
+            INSERT INTO logs (
+                timestamp, username, question, 
+                kb_left, model_left, answer_left, feedback_left, cost_left, time_left,
+                kb_right, model_right, answer_right, feedback_right, cost_right, time_right
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        """, (
+            timestamp, username, q,
+            kb_left, r_left['model'], r_left['answer'], "", r_left['cost'], r_left['time'],
+            kb_right, r_right['model'], r_right['answer'], "", r_right['cost'], r_right['time']
+        ))
+        
+        conn.commit()
+        conn.close()
+    except Exception as e: 
+        print(f"❌ Error saving to DB: {e}")
+
+def save_feedback(username, prompt, model, feedback_data, answer_text=""):
+    try:
+        conn = get_db_connection()
+        cursor = conn.cursor()
+        
+        if isinstance(feedback_data, dict):
+            scores_str = (
+                f"[Acc:{feedback_data.get('accuracy', 0)} "
+                f"Comp:{feedback_data.get('completeness', 0)} "
+                f"Det:{feedback_data.get('details', 0)} "
+                f"Use:{feedback_data.get('usefulness', 0)} "
+                f"Sat:{feedback_data.get('satisfaction', 0)}]"
+            )
+            suggestion = feedback_data.get('suggestion', '').replace('\n', ' ').strip()
+            feedback_val = f"{scores_str} Suggestion: {suggestion}" if suggestion else scores_str
+        else:
+            feedback_val = str(feedback_data)
+
+        # Update the latest matching row
+        # Check Left Side
+        cursor.execute("""
+            UPDATE logs 
+            SET feedback_left = ? 
+            WHERE username = ? AND question = ? AND answer_left = ?
+        """, (feedback_val, username, prompt, answer_text))
+        
+        if cursor.rowcount == 0:
+            # Check Right Side
+            cursor.execute("""
+                UPDATE logs 
+                SET feedback_right = ? 
+                WHERE username = ? AND question = ? AND answer_right = ?
+            """, (feedback_val, username, prompt, answer_text))
+            
+        conn.commit()
+        conn.close()
+    except Exception as e:
+        print(f"❌ Error saving feedback to DB: {e}")
+
+def load_history_from_sheet(target_username):
+    try:
+        conn = get_db_connection()
+        if target_username:
+            query = "SELECT * FROM logs WHERE username = ?"
+            df = pd.read_sql_query(query, conn, params=(target_username,))
+        else:
+            query = "SELECT * FROM logs"
+            df = pd.read_sql_query(query, conn)
+        conn.close()
+        
+        # Rename columns to match existing main.py expectations if necessary
+        # Existing Main expectations (from Sheet): 
+        # [Timestamp, Username, Question, KB_Left, Model_Left, Answer_Left, Feedback_Left, Cost_Left, KB_Right, Model_Right, Answer_Right, Feedback_Right, Cost_Right]
+        
+        mapping = {
+            'timestamp': 'Timestamp',
+            'username': 'Username',
+            'question': 'Question',
+            'kb_left': 'KB_Left',
+            'model_left': 'Model_Left',
+            'answer_left': 'Answer_Left',
+            'feedback_left': 'Feedback_Left',
+            'cost_left': 'Cost_Model_Left',
+            'time_left': 'Time_Left',
+            'kb_right': 'KB_Right',
+            'model_right': 'Model_Right',
+            'answer_right': 'Answer_Right',
+            'feedback_right': 'Feedback_Right',
+            'cost_right': 'Cost_Model_Right',
+            'time_right': 'Time_Right'
+        }
+        df = df.rename(columns=mapping)
+        return df
+    except Exception as e: 
+        print(f"Error loading history from DB: {e}")
+        return pd.DataFrame()
+
+def generate_dashboard_insight(logs_df, model_name="Claude 4.6 Sonnet"):
+    """
+    Sends recent logs to an AI model to generate strategic insights.
+    """
+    if logs_df.empty:
+        return "ไม่มีข้อมูลเพียงพอสำหรับการวิเคราะห์"
+    
+    # Selection of key columns to save tokens and improve focus
+    cols = ['Timestamp', 'Username', 'Question', 'Model_Left', 'Sat_Left', 'Model_Right', 'Sat_Right']
+    available_cols = [c for c in cols if c in logs_df.columns]
+    
+    # Take latest 30 logs and convert to a clean markdown table string
+    recent_logs = logs_df[available_cols].tail(30).to_markdown(index=False)
+    
+    # Specialized Insight Prompt
+    prompt = f"""
+    คุณคือผู้เชี่ยวชาญด้านการวิเคราะห์ข้อมูลและกลยุทธ์ (AI Strategic Consultant)
+    ภารกิจ: วิเคราะห์พฤติกรรมการใช้งานระบบ Smart Court AI (ผู้ช่วยอัจฉริยะศาลปกครอง) จาก Logs ล่าสุด 30 รายการ
+    
+    ข้อมูล Logs:
+    {recent_logs}
+    
+    จงสรุปภาพรวมในรูปแบบรายงานเชิงลึก (Insight Report) โดยใช้หัวข้อต่อไปนี้:
+    
+    1. 📊 **พฤติกรรมการใช้งาน (Usage Trends):** ผู้ใช้ส่วนใหญ่ถามเรื่องอะไร? มีรูปแบบคำถามซ้ำๆ หรือหัวข้อที่กำลังเป็นกระแสหรือไม่?
+    2. ⚠️ **วิเคราะห์ปัญหาและความผิดพลาด (Pain Points & Failure Analysis):** 
+       - วิเคราะห์เคสที่ผู้ใช้ให้คะแนน Satisfaction ต่ำ (1-2 ดาว)
+       - เปรียบเทียบว่าคำถามประเภทไหนที่โมเดลมักจะตอบไม่ตรงใจผู้ใช้
+    3. 💡 **ข้อเสนอแนะเชิงพัฒนา (Strategic Recommendations):**
+       - ควรเพิ่มข้อมูลเรื่องใดเข้าไปใน Knowledge Base (คลังเอกสาร)?
+       - ควรปรับปรุง Prompt ในเรื่องใดเพื่อให้คำตอบแม่นยำขึ้น?
+    4. 📋 **Action Plan (To-do list):** รายการสิ่งที่แอดมินต้องรีบดำเนินการแก้ไข 3-5 ข้อ
+    
+    ตอบเป็นภาษาไทยที่เป็นทางการ สุภาพ และให้ข้อมูลที่สามารถนำไปปฏิบัติจริงได้ (Actionable Insights)
+    """
+    
+    try:
+        # Use a neutral system prompt for analysis to avoid "Court Assistant" persona leaking into the report
+        analysis_sys_prompt = "You are a professional Data Analyst and AI Strategist. Summarize the provided logs objectively and provide strategic business recommendations."
+        res = call_single_model(model_name, prompt, context="", citations_dict={}, temperature=0.2, system_instruction=analysis_sys_prompt)
+        return res['answer']
+    except Exception as e:
+        return f"⚠️ ไม่สามารถวิเคราะห์ข้อมูลได้ในขณะนี้: {str(e)}"

@@ -1,0 +1,521 @@
+# src/services.py
+import json
+import time
+import requests
+import os
+import re
+import concurrent.futures
+import streamlit as st
+
+from src.config import REGION, MODELS, SYSTEM_PROMPT, THB_RATE, MODEL_PRICING
+from src.court_contact import enforce_answer_safety
+from src.utils import load_secret
+
+# Initialize Secrets
+AWS_ACCESS_KEY = load_secret("AWS_ACCESS_KEY")
+AWS_SECRET_KEY = load_secret("AWS_SECRET_KEY")
+THAILLM_API_KEY = load_secret("THAILLM_API_KEY")
+
+# ==========================================
+# 🔌 CLIENT FACTORIES
+# ==========================================
+
+@st.cache_resource
+def get_aws_agent():
+    """AWS Bedrock Agent for Knowledge Base retrieval."""
+    if not AWS_ACCESS_KEY: return None
+    import boto3
+    return boto3.client(
+        'bedrock-agent-runtime', 
+        region_name=REGION, 
+        aws_access_key_id=AWS_ACCESS_KEY, 
+        aws_secret_access_key=AWS_SECRET_KEY
+    )
+
+# ==========================================
+# 🧠 LOGIC FUNCTIONS
+# ==========================================
+
+THAI_PROVINCES = (
+    "กรุงเทพมหานคร", "นครปฐม", "นนทบุรี", "ปทุมธานี", "สมุทรปราการ", "สมุทรสาคร",
+    "นครนายก", "สระบุรี", "เชียงใหม่", "เชียงราย", "แม่ฮ่องสอน", "ลำปาง", "ลำพูน",
+    "น่าน", "พะเยา", "แพร่", "สงขลา", "ตรัง", "พัทลุง", "สตูล", "นครราชสีมา",
+    "ชัยภูมิ", "บุรีรัมย์", "สุรินทร์", "ขอนแก่น", "กาฬสินธุ์", "มหาสารคาม",
+    "มุกดาหาร", "พิษณุโลก", "กำแพงเพชร", "ตาก", "พิจิตร", "สุโขทัย", "อุตรดิตถ์",
+    "ระยอง", "จันทบุรี", "ฉะเชิงเทรา", "ชลบุรี", "ตราด", "ปราจีนบุรี", "สระแก้ว",
+    "นครศรีธรรมราช", "สุราษฎร์ธานี", "ชุมพร", "อุดรธานี", "เลย", "หนองคาย",
+    "หนองบัวลำภู", "นครพนม", "บึงกาฬ", "สกลนคร", "อุบลราชธานี", "ยโสธร",
+    "ร้อยเอ็ด", "ศรีสะเกษ", "อำนาจเจริญ", "เพชรบุรี", "ประจวบคีรีขันธ์", "ราชบุรี",
+    "สมุทรสงคราม", "นครสวรรค์", "ชัยนาท", "เพชรบูรณ์", "อุทัยธานี", "ลพบุรี",
+    "สุพรรณบุรี", "กาญจนบุรี", "พระนครศรีอยุธยา", "สิงห์บุรี", "อ่างทอง", "ภูเก็ต",
+    "กระบี่", "พังงา", "ระนอง", "ยะลา", "ปัตตานี", "นราธิวาส"
+)
+
+def expand_query(query):
+    queries = [query]
+    q_lower = query.lower()
+    
+    # 1. Number/Count of courts (กี่แห่ง, มีกี่, จำนวน)
+    if any(k in q_lower for k in ["กี่", "จำนวน", "ทั้งหมด", "กี่ที่", "มีเท่าไร", "มีเท่าไหร่"]):
+        queries.append("รายชื่อศาลปกครองที่เปิดทำการ ข้อมูลทางการ")
+        queries.append("ศาลปกครองชั้นต้นและศาลปกครองในภูมิภาคที่เปิดทำการ")
+        
+    # 2. Jurisdiction / Provinces (ฟ้องศาลไหน, จังหวัด, เขตอำนาจ)
+    if any(k in q_lower for k in ["ศาลไหน", "ฟ้องที่ไหน", "ขึ้นศาลไหน", "เขตอำนาจ", "จังหวัด", "ครอบคลุม"]):
+        queries.append(f"{query} เขตอำนาจศาลปกครอง รายจังหวัด")
+        queries.append("เขตอำนาจของศาลปกครอง")
+        
+    # 3. Contact info / Location (ติดต่อ, เบอร์โทร, อยู่ที่ไหน)
+    if any(k in q_lower for k in ["ติดต่อ", "เบอร์", "โทร", "ที่ตั้ง", "อยู่ไหน", "อยู่ที่ไหน", "เดินทาง", "อีเมล", "ที่ทำการ"]):
+        queries.append(f"{query} ที่ตั้งและช่องทางติดต่อศาลปกครอง")
+        
+    return list(dict.fromkeys(queries))
+
+def retrieve_context(query, kb_id):
+    """Retrieves relevant context from AWS Bedrock Knowledge Base using multi-query expansion."""
+    if not kb_id: 
+        return "", {}
+    
+    agent = get_aws_agent()
+    if not agent: 
+        return "", {}
+
+    try:
+        import concurrent.futures
+        
+        expanded_queries = expand_query(query)
+        court_lookup = any(term in query for term in [
+            "ศาลปกครอง", "เขตอำนาจ", "ศาลไหน", "ฟ้องที่ไหน",
+            "จังหวัด", "ที่ตั้งศาล", "เบอร์โทรศาล"
+        ])
+        results_map = {}
+        
+        def retrieve_single(sub_q):
+            try:
+                res = agent.retrieve(
+                    knowledgeBaseId=kb_id, 
+                    retrievalQuery={'text': sub_q}, 
+                    retrievalConfiguration={'vectorSearchConfiguration': {'numberOfResults': 10}}
+                )
+                return sub_q, res.get('retrievalResults', [])
+            except Exception as e:
+                print(f"Sub-query retrieval error ({sub_q}): {e}")
+                return sub_q, []
+
+        # Run retrievals in parallel
+        with concurrent.futures.ThreadPoolExecutor(max_workers=len(expanded_queries)) as executor:
+            futures = [executor.submit(retrieve_single, sq) for sq in expanded_queries]
+            for f in concurrent.futures.as_completed(futures):
+                sub_q, results = f.result()
+                results_map[sub_q] = results
+
+        # Interleave results starting with original query first to maintain priority, then deduplicate
+        merged_results = []
+        seen_texts = set()
+
+        # Pin exact official province documents before semantic results. Pinecone
+        # supports an equality filter on the built-in source URI metadata.
+        mentioned_provinces = [p for p in THAI_PROVINCES if p in query][:3]
+        for province in mentioned_provinces:
+            try:
+                official_uri = (
+                    "s3://my-company-knowledge-2025/official/"
+                    f"province_jurisdiction/{province}.txt"
+                )
+                official_res = agent.retrieve(
+                    knowledgeBaseId=kb_id,
+                    retrievalQuery={'text': query},
+                    retrievalConfiguration={
+                        'vectorSearchConfiguration': {
+                            'numberOfResults': 3,
+                            'filter': {
+                                'equals': {
+                                    'key': 'x-amz-bedrock-kb-source-uri',
+                                    'value': official_uri
+                                }
+                            }
+                        }
+                    }
+                )
+                for result in official_res.get('retrievalResults', []):
+                    text_chunk = result['content']['text'].strip()
+                    if text_chunk not in seen_texts:
+                        seen_texts.add(text_chunk)
+                        merged_results.append(result)
+            except Exception as e:
+                print(f"Official province retrieval error ({province}): {e}")
+        
+        # Interleave results from all queries
+        max_len = max(len(results_map[sq]) for sq in expanded_queries) if results_map else 0
+        for idx in range(max_len):
+            for sq in expanded_queries:
+                res_list = results_map.get(sq, [])
+                if idx < len(res_list):
+                    r = res_list[idx]
+                    text_chunk = r['content']['text']
+                    norm_text = text_chunk.strip()
+                    if norm_text not in seen_texts:
+                        seen_texts.add(norm_text)
+                        merged_results.append(r)
+
+        # For court/jurisdiction lookups, canonical documents under official/
+        # must precede older statutes and user-created FAQ content.
+        def result_priority(result):
+            uri = result.get('location', {}).get('s3Location', {}).get('uri', '')
+            exact_province = 1 if '/official/province_jurisdiction/' in uri else 0
+            official = 1 if '/official/' in uri else 0
+            return (
+                exact_province if court_lookup else 0,
+                official if court_lookup else 0,
+                result.get("score", 0.0)
+            )
+
+        merged_results.sort(key=result_priority, reverse=True)
+        
+        # Keep top 10 results
+        final_results = merged_results[:10]
+        
+        ctx = ""
+        citation_details = {}
+        for r in final_results:
+            text_chunk = r['content']['text']
+            ctx += f"- {text_chunk}\n"
+            
+            # Extract filename safely
+            uri = r.get('location', {}).get('s3Location', {}).get('uri', 'Unknown')
+            fname = uri.split('/')[-1]
+            
+            if fname not in citation_details:
+                citation_details[fname] = text_chunk[:200].replace('\n', ' ') + "..."
+                
+        return ctx, citation_details
+    except Exception as e: 
+        print(f"KB Error ({kb_id}): {e}")
+        return "", {}
+
+def calculate_cost(model_id, full_text_in, full_text_out):
+    """Estimates cost in THB."""
+    pricing = MODEL_PRICING.get(model_id, [0, 0])
+    in_tokens = len(full_text_in) / 3.0 
+    out_tokens = len(full_text_out) / 3.0
+    cost = (in_tokens/1e6 * pricing[0]) + (out_tokens/1e6 * pricing[1])
+    return cost * THB_RATE
+
+def call_single_model(model_name, prompt, context, citations_dict, temperature=0.5, chat_history=None, placeholder=None):
+    """Invokes a single AI model with optional multi-turn conversation history."""
+    cfg = MODELS[model_name]
+    answer = ""
+    start_time = time.time()
+
+    # ── Build messages array ──────────────────────────────────────────────────
+    # System message carries the RAG context + instructions
+    system_content = f"{SYSTEM_PROMPT}\n\nContext:\n{context}"
+
+    # For cost estimation we track approximate total input text
+    full_input = system_content + prompt
+
+    messages = [{"role": "system", "content": system_content}]
+
+    # Inject last N turns of conversation history (max 5 exchanges = 10 msgs)
+    if chat_history:
+        import re as _re
+        for msg in chat_history[-10:]:
+            role = msg.get("role", "")
+            if role == "user":
+                messages.append({"role": "user", "content": msg.get("content", "")[:1500]})
+                full_input += msg.get("content", "")[:1500]
+            elif role == "assistant":
+                # Extract the answer for this specific model (fall back to any model)
+                results = msg.get("results", {})
+                answer_text = ""
+                if model_name in results:
+                    answer_text = results[model_name].get("answer", "")
+                elif results:
+                    answer_text = list(results.values())[0].get("answer", "")
+                # Strip residual <think> tags before inserting into history
+                answer_text = _re.sub(r'<think>.*?</think>', '', answer_text, flags=_re.DOTALL).strip()
+                if answer_text:
+                    messages.append({"role": "assistant", "content": answer_text[:1500]})
+                    full_input += answer_text[:1500]
+
+    # Append the current user question
+    messages.append({"role": "user", "content": prompt})
+    # ─────────────────────────────────────────────────────────────────────────
+
+    try:
+        # --- ThaiLLM API ---
+        if cfg["type"] == "thaillm":
+            if not THAILLM_API_KEY:
+                raise ValueError("ThaiLLM API Key missing")
+
+            headers = {
+                "Content-Type": "application/json",
+                "apikey": THAILLM_API_KEY
+            }
+
+            payload = {
+                "model": "/model",  # ThaiLLM expects this exact value
+                "messages": messages,
+                "max_tokens": 2048,
+                "temperature": temperature,
+                "stream": True
+            }
+            
+            # Make API request
+            response = requests.post(
+                cfg["endpoint"],
+                headers=headers,
+                json=payload,
+                timeout=60,
+                stream=True
+            )
+            
+            if response.status_code == 200:
+                answer = ""
+                for line in response.iter_lines():
+                    if line:
+                        line_str = line.decode('utf-8')
+                        if line_str.startswith('data: ') and line_str != 'data: [DONE]':
+                            try:
+                                chunk = json.loads(line_str[6:])
+                                delta = chunk.get('choices', [{}])[0].get('delta', {}).get('content', '')
+                                answer += delta
+                                if placeholder:
+                                    import re
+                                    clean_ans = re.sub(r'<think>.*?</think>', '', answer, flags=re.DOTALL).strip()
+                                    if clean_ans:
+                                        placeholder.markdown(f"**{model_name}**\n\n{clean_ans}▌")
+                            except Exception as e:
+                                pass
+                                
+                # Remove <think> tags content
+                import re
+                answer = re.sub(r'<think>.*?</think>', '', answer, flags=re.DOTALL).strip()
+                if placeholder:
+                     placeholder.markdown(f"**{model_name}**\n\n{answer}")
+                
+            else:
+                # Include more debugging info
+                error_msg = f"API Error: {response.status_code}"
+                try:
+                    error_detail = response.json()
+                    error_msg += f" - {error_detail}"
+                except:
+                    error_msg += f" - {response.text}"
+                raise ValueError(error_msg)
+            
+    except Exception as e:
+        _err = str(e)
+        # Log technical detail สำหรับ Admin
+        import streamlit as _st
+        _st.session_state.setdefault("system_logs", []).append(
+            f"❌ [{model_name}] {_err[:200]}"
+        )
+        answer = "⚠️ ขออภัย ระบบไม่สามารถรับคำตอบจากโมเดลนี้ได้ในขณะนี้ กรุณาลองใหม่อีกครั้ง หรือเลือกโมเดลอื่น"
+
+    answer = enforce_answer_safety(prompt, answer, context)
+    if placeholder:
+        placeholder.markdown(f"**{model_name}**\n\n{answer}")
+    
+    elapsed = time.time() - start_time
+    
+    # Get model key for pricing
+    model_key = model_name.lower().split()[0]  # Extract first word for pricing key
+    
+    return {
+        "model": model_name, 
+        "answer": answer, 
+        "citations": citations_dict, 
+        "cost": calculate_cost(model_key, full_input, answer), 
+        "config": cfg, 
+        "time": elapsed
+    }
+
+def generate_related_questions(query, context, model_name="Typhoon-S 8B"):
+    """
+    Generates 3 related follow-up questions based on the context.
+    Uses user-selected model or falls back to OpenThaiGPT.
+    """
+    try:
+        # Rely on global imports for MODELS and THAILLM_API_KEY
+        import streamlit as st # For debugging
+        
+        # 1. Select Model
+        target_model_key = model_name if model_name in MODELS else None
+        
+        if not target_model_key:
+            for k in MODELS.keys():
+                if "Typhoon" in k:
+                    target_model_key = k
+                    break
+        
+        # Fallback to OpenThaiGPT if Typhoon missing
+        if not target_model_key:
+             for k in MODELS.keys():
+                if "OpenThaiGPT" in k:
+                    target_model_key = k
+                    break
+        
+        # Final fallback
+        if not target_model_key:
+            target_model_key = list(MODELS.keys())[0]
+
+        cfg = MODELS[target_model_key]
+        
+        # 2. Prepare Request
+        headers = {
+            "Content-Type": "application/json",
+            "Authorization": f"Bearer {THAILLM_API_KEY}",
+            "apikey": THAILLM_API_KEY
+        }
+        
+        prompt = f"""
+        Instructions:
+        Based on the user's question and context, suggest 3 RELEVANT and VERY SHORT follow-up questions in Thai.
+        
+        Strict Rules:
+        1. NO <think> tags. Output ONLY the questions.
+        2. Questions must be under 10 words.
+        3. No numbering (e.g. 1.), no bullets.
+        4. Focus on Administrative Court procedures.
+
+        Context: {context[:500]}...
+        User Question: {query}
+        
+        Suggested Questions:
+        """
+        
+        # Use "/model" as expected by ThaiLLM API (same as call_single_model)
+        model_id_for_payload = "/model"
+
+        payload = {
+            "model": model_id_for_payload, 
+            "messages": [{"role": "user", "content": prompt}],
+            "max_tokens": 200,
+            "temperature": 0.7
+        }
+        
+        # 3. Call API
+        # Increased timeout to 20s
+        response = requests.post(cfg["endpoint"], headers=headers, json=payload, timeout=20)
+        
+        if response.status_code == 200:
+            data = response.json()
+            content = data.get('choices', [{}])[0].get('message', {}).get('content', '')
+            
+            # Remove <think> tags
+            import re
+            content = re.sub(r'<think>.*?</think>', '', content, flags=re.DOTALL).strip()
+            
+            # Robust Parsing
+            lines = [line.strip() for line in content.split('\n') if line.strip()]
+            questions = []
+            for line in lines:
+                # Remove common prefixes like "1.", "-", "*"
+                clean = re.sub(r'^[\d\-\*\.]+\s*', '', line)
+                if len(clean) > 5: # Min length check
+                    questions.append(clean)
+            
+            return questions[:3]
+            
+        else:
+            error_msg = f"Suggestion API Error: {response.status_code} - {response.text[:100]}"
+            st.session_state.setdefault("system_logs", []).append(f"❌ {error_msg}")
+            return []
+            
+    except Exception as e:
+        import streamlit as _st2
+        _st2.session_state.setdefault("system_logs", []).append(f"❌ Suggestion Exception: {str(e)[:100]}")
+        return []
+
+def generate_dashboard_insight(log_summary_text):
+    """
+    Calls AI to analyze the provided log summary text and return strategic insights.
+    """
+    target_model_key = "Typhoon-S 8B" # Good for reasoning/summary
+    if target_model_key not in MODELS:
+        target_model_key = list(MODELS.keys())[0]
+    
+    cfg = MODELS[target_model_key]
+    
+    headers = {
+        "Content-Type": "application/json",
+        "apikey": THAILLM_API_KEY
+    }
+    
+    # Keep each request bounded without shortening any individual answer. Analyze
+    # chunks first and synthesize them into one complete report.
+    raw_entries = log_summary_text.split("\nCASE\n")
+    chunks, current, current_len = [], [], 0
+    for entry in raw_entries:
+        entry = entry.strip()
+        if not entry:
+            continue
+        if current and current_len + len(entry) > 22000:
+            chunks.append("\n\nCASE\n".join(current))
+            current, current_len = [], 0
+        current.append(entry)
+        current_len += len(entry)
+    if current:
+        chunks.append("\n\nCASE\n".join(current))
+
+    def request_analysis(content, max_tokens=3000):
+        payload = {
+            "model": "/model",
+            "messages": [{"role": "user", "content": content}],
+            "max_tokens": max_tokens,
+            "temperature": 0.2
+        }
+        response = requests.post(cfg["endpoint"], headers=headers, json=payload, timeout=120)
+        if response.status_code != 200:
+            raise RuntimeError(f"AI Insight Error: {response.status_code}")
+        result = response.json()
+        answer = result.get('choices', [{}])[0].get('message', {}).get('content', '')
+        return re.sub(r'<think>.*?</think>', '', answer, flags=re.DOTALL).strip()
+
+    def analyze_chunk(chunk_args):
+        index, chunk = chunk_args
+        prompt = f"""
+    บทบาท: คุณคือ "ผู้เชี่ยวชาญด้านการวิเคราะห์ข้อมูล AI สำหรับองค์กร"
+    หน้าที่: วิเคราะห์คำถาม คำตอบเต็ม คะแนน 5 มิติ และความคิดเห็นของแชทบอทศาลปกครอง
+    ข้อมูลชุดที่ {index} จาก {len(chunks)}
+    
+    คำแนะนำ:
+    1. แยกหัวข้อและปัญหารายโมเดล โดยเน้นคะแนน 1-2
+    2. ยกข้อความสำคัญจากคำตอบที่แสดงปัญหาและอธิบายสาเหตุ
+    3. เสนอสิ่งที่ต้องแก้ใน Knowledge Base หรือ Prompt
+    4. ห้ามแต่งข้อเท็จจริงนอกข้อมูล
+    
+    Logs Data:
+    {chunk}
+    
+    รายงานย่อย:
+    """
+        try:
+            return index, request_analysis(prompt)
+        except Exception as e:
+            return index, f"ข้อมูลชุดที่ {index} วิเคราะห์ไม่สำเร็จ: {e}"
+
+    with concurrent.futures.ThreadPoolExecutor(max_workers=min(4, len(chunks))) as executor:
+        reports = [
+            report for _, report in sorted(
+                executor.map(analyze_chunk, enumerate(chunks, 1)),
+                key=lambda item: item[0]
+            )
+        ]
+
+    try:
+        synthesis = f"""
+สังเคราะห์รายงานย่อยเป็นรายงานภาษาไทยฉบับสมบูรณ์ โดยต้องมี:
+Executive Summary ไม่เกิน 10 บรรทัด, ขอบเขตข้อมูล, แนวโน้มการใช้งาน,
+ปัญหาคะแนนต่ำพร้อมข้อความหลักฐาน, เปรียบเทียบทั้ง 5 มิติ รวมเวลาและต้นทุน,
+ความเสี่ยงและผลกระทบ, ประสิทธิผลของ Knowledge Base, สาเหตุราก,
+ข้อเสนอแนะ KB/Prompt และ Action Plan ที่ระบุความสำคัญ เจ้าของงานที่เหมาะสม
+และตัวชี้วัดหลังแก้ ห้ามแต่งข้อมูลและห้ามจบกลางประโยค
+หากข้อมูลด้านใดไม่มีให้ระบุว่า “ยังไม่มีข้อมูล”
+
+{chr(10).join(reports)}
+"""
+        return request_analysis(synthesis, max_tokens=4000)
+    except Exception as e:
+        return "\n\n".join(reports) + f"\n\n⚠️ ไม่สามารถรวมรายงานได้: {e}"

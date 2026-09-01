@@ -1,0 +1,46 @@
+{
+  "generated_at": "2026-06-06T02:01:07.447361",
+  "source_bucket": "s3://my-company-knowledge-2025",
+  "total_source_files": 560,
+  "total_rag_chunks": 1014,
+  "knowledge_graph": {
+    "courts": 9,
+    "laws": 4,
+    "procedures": 6,
+    "case_types": 5,
+    "source_documents": 18,
+    "relations": 27
+  },
+  "rag_files": {
+    "01_kb_docs_chunks.jsonl": {
+      "source": "kb_docs/",
+      "documents": 18,
+      "description": "เอกสารกฎหมายและขั้นตอน"
+    },
+    "02_faq_pairs.jsonl": {
+      "source": "faq/",
+      "documents": 509,
+      "description": "ถาม-ตอบ FAQ"
+    },
+    "03_law_chunks.jsonl": {
+      "source": "root/*.txt/*.doc",
+      "documents": 7,
+      "description": "ข้อมูลกฎหมายหลัก"
+    },
+    "04_manual_merged.jsonl": {
+      "source": "Administrative litigation manual_text/",
+      "documents": 236,
+      "description": "คู่มือดำเนินคดีแยกหน้า"
+    },
+    "05_qa_media.jsonl": {
+      "source": "QA_FB/",
+      "documents": 158,
+      "description": "ถาม-ตอบจากสื่อ"
+    }
+  },
+  "chunk_config": {
+    "chunk_size_tokens": 500,
+    "overlap_tokens": 80,
+    "language": "th"
+  }
+}

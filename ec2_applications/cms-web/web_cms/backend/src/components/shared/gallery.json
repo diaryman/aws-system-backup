@@ -1,0 +1,27 @@
+{
+    "collectionName": "components_shared_galleries",
+    "info": {
+        "displayName": "Gallery",
+        "icon": "images",
+        "description": ""
+    },
+    "options": {},
+    "attributes": {
+        "images": {
+            "type": "media",
+            "multiple": true,
+            "required": false,
+            "allowedTypes": [
+                "images"
+            ]
+        },
+        "layout": {
+            "type": "enumeration",
+            "enum": [
+                "grid",
+                "slider"
+            ],
+            "default": "grid"
+        }
+    }
+}

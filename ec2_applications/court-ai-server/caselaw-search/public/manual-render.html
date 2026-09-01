@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <title>คู่มือการใช้งาน - SLegalTools Research Hub</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Sarabun:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --primary-color: #064e3b; /* Forest Green */
+      --secondary-color: #047857;
+      --accent-color: #d97706; /* Amber/Gold */
+      --bg-dark: #121824; /* Dark Charcoal */
+      --card-bg: #1e293b;
+      --text-main: #f1f5f9;
+      --text-muted: #94a3b8;
+      --border-color: #334155;
+    }
+
+    /* Print settings */
+    @page {
+      size: A4;
+      margin: 20mm;
+    }
+
+    body {
+      font-family: 'Sarabun', 'Inter', sans-serif;
+      background-color: #ffffff;
+      color: #1e293b;
+      margin: 0;
+      padding: 0;
+      line-height: 1.6;
+      -webkit-print-color-adjust: exact;
+      print-color-adjust: exact;
+    }
+
+    .container {
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 0;
+    }
+
+    /* Cover Page / Header */
+    .header-banner {
+      background: linear-gradient(135deg, #064e3b 0%, #022c22 100%);
+      color: #ffffff;
+      padding: 40px;
+      border-radius: 12px;
+      margin-bottom: 40px;
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+    }
+
+    .header-banner h1 {
+      margin: 0 0 10px 0;
+      font-size: 32px;
+      font-weight: 700;
+      letter-spacing: -0.5px;
+    }
+
+    .header-banner p {
+      margin: 0;
+      font-size: 16px;
+      color: #a7f3d0;
+      font-weight: 300;
+    }
+
+    h2 {
+      color: #064e3b;
+      border-bottom: 2px solid #e2e8f0;
+      padding-bottom: 8px;
+      margin-top: 40px;
+      margin-bottom: 20px;
+      font-size: 22px;
+      font-weight: 600;
+      page-break-after: avoid;
+    }
+
+    h3 {
+      color: #047857;
+      margin-top: 25px;
+      font-size: 18px;
+      font-weight: 600;
+      page-break-after: avoid;
+    }
+
+    p {
+      margin: 0 0 15px 0;
+      font-size: 14px;
+      color: #334155;
+      text-align: justify;
+    }
+
+    ol, ul {
+      margin: 0 0 20px 0;
+      padding-left: 20px;
+      font-size: 14px;
+      color: #334155;
+    }
+
+    li {
+      margin-bottom: 8px;
+    }
+
+    /* Alert Boxes (GitHub style) */
+    .alert {
+      padding: 15px 20px;
+      border-radius: 8px;
+      margin: 20px 0;
+      font-size: 13.5px;
+      border-left: 4px solid #ccc;
+      page-break-inside: avoid;
+    }
+
+    .alert-tip {
+      background-color: #ecfdf5;
+      border-left-color: #10b981;
+      color: #065f46;
+    }
+
+    .alert-note {
+      background-color: #eff6ff;
+      border-left-color: #3b82f6;
+      color: #1e3a8a;
+    }
+
+    .alert-important {
+      background-color: #fffbeb;
+      border-left-color: #f59e0b;
+      color: #78350f;
+    }
+
+    .alert-title {
+      font-weight: 700;
+      margin-bottom: 5px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    /* Images */
+    .screenshot-container {
+      margin: 25px 0;
+      text-align: center;
+      page-break-inside: avoid;
+    }
+
+    .screenshot {
+      max-width: 100%;
+      height: auto;
+      border-radius: 8px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+      border: 1px solid #e2e8f0;
+      background-color: #f8fafc;
+    }
+
+    .caption {
+      font-size: 12px;
+      color: #64748b;
+      margin-top: 8px;
+      font-style: italic;
+    }
+
+    .footer {
+      margin-top: 60px;
+      border-top: 1px solid #e2e8f0;
+      padding-top: 20px;
+      text-align: center;
+      font-size: 12px;
+      color: #94a3b8;
+    }
+
+    /* Page breaks for print */
+    .page-break {
+      page-break-before: always;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <!-- Cover Page -->
+    <div class="header-banner">
+      <h1>📚 คู่มือการใช้งานระบบ Legal Search & Citation App</h1>
+      <p>ระบบค้นหาคำพิพากษาและสร้างชุดเอกสารอ้างอิงคดีอัจฉริยะ (SLegalTools Research Hub)</p>
+    </div>
+
+    <p>ระบบนี้ออกแบบมาเพื่อช่วยให้นักกฎหมาย ทนายความ และผู้ที่สนใจ สามารถค้นหาข้อมูลทางกฎหมาย วิเคราะห์ประเด็น และสรุปรูปคดีได้อย่างรวดเร็วด้วยพลังของปัญญาประดิษฐ์ (AI)</p>
+
+    <!-- Section 1 -->
+    <h2>1. หน้าจอหลักและการค้นหาทั่วไป (Home & Search)</h2>
+    <p>เมื่อเข้าสู่ระบบ คุณจะพบกับหน้าจอหลักที่ออกแบบมาให้ใช้งานง่าย พร้อมระบบค้นหาที่ครอบคลุม:</p>
+    
+    <div class="screenshot-container">
+      <img class="screenshot" src="/manual-assets/initial_page_load_1780881663561.png" alt="หน้าจอหลักของระบบ">
+      <div class="caption">ภาพที่ 1: หน้าจอหลักของระบบ Legal Search Hub</div>
+    </div>
+
+    <div class="alert alert-tip">
+      <div class="alert-title">💡 เคล็ดลับการค้นหาอัจฉริยะ (AI Deka Search)</div>
+      คุณสามารถพิมพ์คำถามด้วยภาษาธรรมชาติ เช่น "ทำร้ายร่างกายจนบาดเจ็บสาหัส มีความผิดอย่างไร" ระบบ AI จะทำการวิเคราะห์และค้นหาคำพิพากษาศาลฎีกาที่เกี่ยวข้องมาให้ทันทีโดยไม่ต้องจำคีย์เวิร์ด
+    </div>
+
+    <div class="screenshot-container">
+      <img class="screenshot" src="/manual-assets/search_results_page_1780881817868.png" alt="ผลลัพธ์การค้นหาคำพิพากษา">
+      <div class="caption">ภาพที่ 2: หน้าจอแสดงผลลัพธ์การค้นหาคดีศาลฎีกาที่เกี่ยวข้อง</div>
+    </div>
+
+    <!-- Page Break -->
+    <div class="page-break"></div>
+
+    <!-- Section 2 -->
+    <h2>2. การค้นหาตัวบทกฎหมาย (Legal Code Search)</h2>
+    <p>นอกจากการค้นหาคำพิพากษาแล้ว คุณยังสามารถสลับไปที่แท็บ <strong>"ค้นหาตัวบทกฎหมาย"</strong> เพื่อค้นหามาตราหรือเนื้อหากฎหมายที่ต้องการได้อย่างรวดเร็ว พร้อมแสดงประวัติการแก้ไขและข้อมูลเชิงสถิติของมาตรานั้นๆ</p>
+
+    <div class="screenshot-container">
+      <img class="screenshot" src="/manual-assets/search_legal_code_page_1780881678164.png" alt="หน้าจอการค้นหาตัวบทกฎหมาย">
+      <div class="caption">ภาพที่ 3: แท็บค้นหาตัวบทกฎหมาย OCS</div>
+    </div>
+
+    <!-- Section 3 -->
+    <h2>3. ผู้ช่วยทนายความ AI (AI Assistant)</h2>
+    <p>ที่แถบเมนูด้านซ้าย คุณสามารถคลิกเข้าสู่ <strong>"ผู้ช่วยทนายความ AI"</strong> เพื่อพูดคุยและปรึกษาประเด็นข้อกฎหมายได้ ระบบนี้เชื่อมต่อกับ AWS Bedrock (รองรับโมเดล Amazon Nova และ Claude) ซึ่งจะช่วยตอบคำถาม สรุปประเด็น หรือช่วยร่างคำฟ้องได้อย่างชาญฉลาด</p>
+
+    <div class="screenshot-container">
+      <img class="screenshot" src="/manual-assets/ai_assistant_page_1780881701756.png" alt="ผู้ช่วยทนายความ AI">
+      <div class="caption">ภาพที่ 4: การแชทปรึกษาข้อกฎหมายกับ AI Assistant</div>
+    </div>
+
+    <div class="alert alert-note">
+      <div class="alert-title">📌 หมายเหตุ</div>
+      ระบบ AI Assistant รองรับการแสดงผลแบบ Streaming ทำให้ข้อความคำตอบจะค่อยๆ ปรากฏขึ้นมาทันทีโดยไม่ต้องรอนาน เหมือนการสนทนาจริง
+    </div>
+
+    <!-- Page Break -->
+    <div class="page-break"></div>
+
+    <!-- Section 4 -->
+    <h2>4. ระบบจัดการ Workspace และ สร้าง Citation Pack</h2>
+    <p>ฟีเจอร์เด่นของระบบนี้คือการรวบรวมคำพิพากษาศาลฎีกาหลายๆ คดี มาจัดทำเป็น <strong>ชุดเอกสารอ้างอิงคดีความ (Citation Pack)</strong> เพื่อยื่นต่อศาลหรือใช้เขียนสำนวนคดี</p>
+
+    <h3>วิธีใช้งาน:</h3>
+    <ol>
+      <li>ในหน้าค้นหาคำพิพากษา ให้กดปุ่ม <strong>"เพิ่มลง Workspace"</strong> ที่คดีที่คุณสนใจ</li>
+      <li>ไปที่เมนู <strong>"Workspace"</strong> ทางด้านซ้าย คุณจะเห็นรายการคดีที่ถูกบันทึกไว้</li>
+      <li>ระบุ <strong>ประเด็นข้อพิพาท (Issue)</strong> และข้อเท็จจริงเพื่อประมวลผล</li>
+      <li>เลือก Engine ที่ต้องการใช้งาน (AWS Bedrock หรือ SLegalTools AI)</li>
+      <li>กดปุ่ม <strong>"สร้างชุดเอกสารอ้างอิงคดี"</strong></li>
+    </ol>
+
+    <div class="screenshot-container">
+      <img class="screenshot" src="/manual-assets/workspace_page_with_item_1780881868487.png" alt="หน้าระบบ Workspace">
+      <div class="caption">ภาพที่ 5: จัดการรายการคดีและกรอกข้อมูลประเด็นข้อพิพาทใน Workspace</div>
+    </div>
+
+    <p>หลังจากสั่งสร้าง ระบบจะทำการรวบรวมคดีทั้งหมดมาวิเคราะห์ร่วมกับประเด็นที่คุณกรอก และจัดหน้าผลลัพธ์เป็นเอกสารอ้างอิงที่เรียบร้อยสวยงาม สามารถนำไปคัดลอกหรือดาวน์โหลดต่อได้ทันที</p>
+
+    <!-- Page Break -->
+    <div class="page-break"></div>
+
+    <!-- Section 5 -->
+    <h2>5. การตั้งค่าระบบ (Settings)</h2>
+    <p>เมนูตั้งค่าช่วยให้คุณสามารถปรับแต่งการทำงานของแอปพลิเคชันให้เข้ากับความต้องการของคุณได้ รวมถึงตรวจสอบสถานะการเชื่อมต่อ API และ AWS ของคุณ</p>
+
+    <div class="screenshot-container">
+      <img class="screenshot" src="/manual-assets/settings_page_1780881713667.png" alt="หน้าการตั้งค่าระบบ">
+      <div class="caption">ภาพที่ 6: หน้าการตั้งค่าระบบ ขนาดตัวอักษร และประวัติ API</div>
+    </div>
+
+    <div class="alert alert-important">
+      <div class="alert-title">⚠️ ข้อมูลสำคัญด้านความปลอดภัย</div>
+      การตั้งค่ารหัส API Key และการตั้งค่าหน้าจอจะถูกจัดเก็บไว้ในเบราว์เซอร์ของคุณอย่างปลอดภัยด้วย LocalStorage ทำให้มีความเป็นส่วนตัวสูงและไม่ต้องตั้งค่าใหม่เมื่อเปิดโปรแกรมครั้งถัดไป
+    </div>
+
+    <div class="footer">
+      <p>จัดทำโดยทีมพัฒนา SLegalTools Research Hub &copy; 2026</p>
+    </div>
+  </div>
+</body>
+</html>

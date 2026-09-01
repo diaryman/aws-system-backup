@@ -1,0 +1,18 @@
+{
+    "collectionName": "components_shared_news_grids",
+    "info": {
+        "displayName": "News Grid",
+        "icon": "grid",
+        "description": ""
+    },
+    "options": {},
+    "attributes": {
+        "title": {
+            "type": "string"
+        },
+        "limit": {
+            "type": "integer",
+            "default": 4
+        }
+    }
+}

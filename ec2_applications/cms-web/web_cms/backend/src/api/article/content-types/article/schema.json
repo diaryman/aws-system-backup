@@ -1,0 +1,74 @@
+{
+    "kind": "collectionType",
+    "collectionName": "articles",
+    "info": {
+        "singularName": "article",
+        "pluralName": "articles",
+        "displayName": "Article",
+        "description": "News and Articles"
+    },
+    "options": {
+        "draftAndPublish": true
+    },
+    "attributes": {
+        "title": {
+            "type": "string",
+            "required": true
+        },
+        "slug": {
+            "type": "uid",
+            "targetField": "title",
+            "required": true
+        },
+        "description": {
+            "type": "text"
+        },
+        "content": {
+            "type": "dynamiczone",
+            "components": [
+                "shared.rich-text",
+                "shared.hero",
+                "shared.news-grid",
+                "shared.gallery"
+            ]
+        },
+        "coverImage": {
+            "type": "media",
+            "multiple": false,
+            "required": false,
+            "allowedTypes": [
+                "images"
+            ]
+        },
+        "category": {
+            "type": "relation",
+            "relation": "manyToOne",
+            "target": "api::category.category",
+            "inversedBy": "articles"
+        },
+        "domain": {
+            "type": "string"
+        },
+        "seoTitle": {
+            "type": "string"
+        },
+        "seoDescription": {
+            "type": "text"
+        },
+        "seoKeywords": {
+            "type": "string"
+        },
+        "ogImage": {
+            "type": "media",
+            "multiple": false,
+            "allowedTypes": [
+                "images"
+            ]
+        },
+        "viewCount": {
+            "type": "integer",
+            "default": 0,
+            "min": 0
+        }
+    }
+}

@@ -1,0 +1,136 @@
+{
+    "kind": "collectionType",
+    "collectionName": "site_configs",
+    "info": {
+        "singularName": "site-config",
+        "pluralName": "site-configs",
+        "displayName": "Site Config",
+        "description": "Configuration for multiple sites"
+    },
+    "options": {
+        "draftAndPublish": true
+    },
+    "attributes": {
+        "siteName": {
+            "type": "string",
+            "required": true
+        },
+        "domain": {
+            "type": "string",
+            "required": true,
+            "unique": true
+        },
+        "announcement": {
+            "type": "string"
+        },
+        "footerText": {
+            "type": "text"
+        },
+        "address": {
+            "type": "text"
+        },
+        "phone": {
+            "type": "string"
+        },
+        "email": {
+            "type": "email"
+        },
+        "officeHours": {
+            "type": "string",
+            "default": "วันจันทร์ - วันศุกร์ เวลา 08.30 - 16.30 น. (ยกเว้นวันหยุดราชการ)"
+        },
+        "heroHeadline": {
+            "type": "text"
+        },
+        "heroSubheadline": {
+            "type": "text"
+        },
+        "heroStats": {
+            "type": "json"
+        },
+        "notifications": {
+            "type": "json"
+        },
+        "themeColors": {
+            "type": "json"
+        },
+        "navbarMenu": {
+            "type": "json"
+        },
+        "footerMenu": {
+            "type": "json"
+        },
+        "logoImage": {
+            "type": "media",
+            "multiple": false,
+            "allowedTypes": [
+                "images"
+            ]
+        },
+        "sectionToggles": {
+            "type": "json"
+        },
+        "cookieConsent": {
+            "type": "json"
+        },
+        "legalPages": {
+            "type": "json"
+        },
+        "notFoundPage": {
+            "type": "json"
+        },
+        "dpoPhone": {
+            "type": "string"
+        },
+        "dpoEmail": {
+            "type": "email"
+        },
+        "socialLinks": {
+            "type": "json",
+            "description": "Social media links: { facebook, youtube, twitter, line }"
+        },
+        "sectionOrder": {
+            "type": "json",
+            "description": "Array defining the display order of homepage sections"
+        },
+        "headerStyle": {
+            "type": "enumeration",
+            "enum": [
+                "style-1",
+                "style-2",
+                "style-3"
+            ],
+            "default": "style-1"
+        },
+        "footerStyle": {
+            "type": "enumeration",
+            "enum": [
+                "style-1",
+                "style-2",
+                "style-3"
+            ],
+            "default": "style-1"
+        },
+        "fontFamily": {
+            "type": "enumeration",
+            "enum": [
+                "sarabun",
+                "prompt",
+                "kanit",
+                "notoSansThai"
+            ],
+            "default": "prompt"
+        },
+        "navbarMenuStyle": {
+            "type": "enumeration",
+            "enum": [
+                "pill",
+                "underline",
+                "outline",
+                "glow",
+                "minimal"
+            ],
+            "default": "pill"
+        }
+    }
+}

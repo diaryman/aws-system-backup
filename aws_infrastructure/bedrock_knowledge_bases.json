@@ -1,0 +1,169 @@
+{
+  "us-east-1": [
+    {
+      "summary": {
+        "knowledgeBaseId": "X0TFMCZC7X",
+        "name": "Smart-Court-KB2",
+        "description": "Smart-Court-KB2",
+        "status": "ACTIVE",
+        "updatedAt": "2025-12-17T06:46:54.174278+00:00"
+      },
+      "details": {
+        "ResponseMetadata": {
+          "RequestId": "0b94f77f-b35d-4251-bd75-0962aba8f924",
+          "HTTPStatusCode": 200,
+          "HTTPHeaders": {
+            "date": "Tue, 01 Sep 2026 10:17:47 GMT",
+            "content-type": "application/json",
+            "content-length": "1025",
+            "connection": "keep-alive",
+            "x-amzn-requestid": "0b94f77f-b35d-4251-bd75-0962aba8f924",
+            "x-amz-apigw-id": "DA7rzFvIoAMEaQw=",
+            "x-amzn-trace-id": "Root=1-6a96a64b-6f821eaf175b8c6928d5d262"
+          },
+          "RetryAttempts": 0
+        },
+        "knowledgeBase": {
+          "knowledgeBaseId": "X0TFMCZC7X",
+          "name": "Smart-Court-KB2",
+          "knowledgeBaseArn": "arn:aws:bedrock:us-east-1:591671455886:knowledge-base/X0TFMCZC7X",
+          "description": "Smart-Court-KB2",
+          "roleArn": "arn:aws:iam::591671455886:role/service-role/AmazonBedrockExecutionRoleForKnowledgeBase_49a9x",
+          "knowledgeBaseConfiguration": {
+            "type": "VECTOR",
+            "vectorKnowledgeBaseConfiguration": {
+              "embeddingModelArn": "arn:aws:bedrock:us-east-1::foundation-model/amazon.titan-embed-text-v1",
+              "embeddingModelConfiguration": {
+                "bedrockEmbeddingModelConfiguration": {
+                  "embeddingDataType": "FLOAT32"
+                }
+              }
+            }
+          },
+          "storageConfiguration": {
+            "type": "PINECONE",
+            "pineconeConfiguration": {
+              "connectionString": "https://smart-court-kb-vcrk9vc.svc.aped-4627-b74a.pinecone.io",
+              "credentialsSecretArn": "arn:aws:secretsmanager:us-east-1:591671455886:secret:pinecone-key-for-bedrock2-WVG1Lm",
+              "namespace": "",
+              "fieldMapping": {
+                "textField": "text",
+                "metadataField": "metadata"
+              }
+            }
+          },
+          "status": "ACTIVE",
+          "createdAt": "2025-12-17T06:35:04.424767+00:00",
+          "updatedAt": "2025-12-17T06:46:54.174278+00:00"
+        }
+      },
+      "data_sources": {
+        "ResponseMetadata": {
+          "RequestId": "cc3bfd96-35c7-462f-bb19-0b3017859541",
+          "HTTPStatusCode": 200,
+          "HTTPHeaders": {
+            "date": "Tue, 01 Sep 2026 10:17:47 GMT",
+            "content-type": "application/json",
+            "content-length": "177",
+            "connection": "keep-alive",
+            "x-amzn-requestid": "cc3bfd96-35c7-462f-bb19-0b3017859541",
+            "x-amz-apigw-id": "DA7r2FAgoAMETlA=",
+            "x-amzn-trace-id": "Root=1-6a96a64b-1274a8b0567273836d3efbef"
+          },
+          "RetryAttempts": 0
+        },
+        "dataSourceSummaries": [
+          {
+            "knowledgeBaseId": "X0TFMCZC7X",
+            "dataSourceId": "LCMASI17O1",
+            "name": "Smart-Court-KB2",
+            "status": "AVAILABLE",
+            "updatedAt": "2025-12-17T06:35:05.441409+00:00"
+          }
+        ]
+      }
+    },
+    {
+      "summary": {
+        "knowledgeBaseId": "UHX3CVMTKL",
+        "name": "knowledge-base-test",
+        "status": "ACTIVE",
+        "updatedAt": "2025-11-28T03:29:48.831677+00:00"
+      },
+      "details": {
+        "ResponseMetadata": {
+          "RequestId": "f58f4e59-b7ac-49a6-a29f-e7812f7bfd93",
+          "HTTPStatusCode": 200,
+          "HTTPHeaders": {
+            "date": "Tue, 01 Sep 2026 10:17:47 GMT",
+            "content-type": "application/json",
+            "content-length": "1005",
+            "connection": "keep-alive",
+            "x-amzn-requestid": "f58f4e59-b7ac-49a6-a29f-e7812f7bfd93",
+            "x-amz-apigw-id": "DA7r6HhXoAMEQJg=",
+            "x-amzn-trace-id": "Root=1-6a96a64b-529d74f577050848530c3a2d"
+          },
+          "RetryAttempts": 0
+        },
+        "knowledgeBase": {
+          "knowledgeBaseId": "UHX3CVMTKL",
+          "name": "knowledge-base-test",
+          "knowledgeBaseArn": "arn:aws:bedrock:us-east-1:591671455886:knowledge-base/UHX3CVMTKL",
+          "roleArn": "arn:aws:iam::591671455886:role/service-role/AmazonBedrockExecutionRoleForKnowledgeBase_dhe2s",
+          "knowledgeBaseConfiguration": {
+            "type": "VECTOR",
+            "vectorKnowledgeBaseConfiguration": {
+              "embeddingModelArn": "arn:aws:bedrock:us-east-1::foundation-model/amazon.titan-embed-text-v1",
+              "embeddingModelConfiguration": {
+                "bedrockEmbeddingModelConfiguration": {
+                  "embeddingDataType": "FLOAT32"
+                }
+              }
+            }
+          },
+          "storageConfiguration": {
+            "type": "PINECONE",
+            "pineconeConfiguration": {
+              "connectionString": "https://company-knowledge-index-vcrk9vc.svc.aped-4627-b74a.pinecone.io",
+              "credentialsSecretArn": "arn:aws:secretsmanager:us-east-1:591671455886:secret:Pinecone-Key-For-Bedrock-3Oiz8W",
+              "namespace": "",
+              "fieldMapping": {
+                "textField": "text",
+                "metadataField": "metadata"
+              }
+            }
+          },
+          "status": "ACTIVE",
+          "createdAt": "2025-11-28T03:29:48.831677+00:00",
+          "updatedAt": "2025-11-28T03:29:48.831677+00:00"
+        }
+      },
+      "data_sources": {
+        "ResponseMetadata": {
+          "RequestId": "cd6f68d0-0dde-4b1b-a12e-e90cfed9fb0e",
+          "HTTPStatusCode": 200,
+          "HTTPHeaders": {
+            "date": "Tue, 01 Sep 2026 10:17:48 GMT",
+            "content-type": "application/json",
+            "content-length": "182",
+            "connection": "keep-alive",
+            "x-amzn-requestid": "cd6f68d0-0dde-4b1b-a12e-e90cfed9fb0e",
+            "x-amz-apigw-id": "DA7r9H8FoAMEd7g=",
+            "x-amzn-trace-id": "Root=1-6a96a64c-1aec73fc56f9d6aa117a55f5"
+          },
+          "RetryAttempts": 0
+        },
+        "dataSourceSummaries": [
+          {
+            "knowledgeBaseId": "UHX3CVMTKL",
+            "dataSourceId": "GDVXKDZHFN",
+            "name": "knowledge-base-test1",
+            "status": "AVAILABLE",
+            "updatedAt": "2025-11-28T03:29:49.793865+00:00"
+          }
+        ]
+      }
+    }
+  ],
+  "ap-southeast-1": []
+}

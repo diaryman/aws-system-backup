@@ -1,0 +1,876 @@
+@import "tailwindcss";
+
+@theme {
+  /* Font families are managed dynamically in layout.tsx via CSS variables */
+
+  --color-primary: var(--primary-color);
+  --color-primary-foreground: var(--primary-foreground);
+
+  --color-accent: var(--accent-color);
+  --color-accent-dark: var(--accent-dark);
+  --color-accent-light: var(--accent-light);
+  --color-accent-subtle: var(--accent-subtle);
+  --color-accent-glow: var(--accent-glow);
+
+  --color-glass-bg: var(--glass-bg);
+  --color-glass-border: var(--glass-border);
+
+  --color-text-muted: var(--text-muted);
+
+  --color-badge-bg: var(--badge-bg);
+  --color-badge-text: var(--badge-text);
+
+  --shadow-premium: var(--premium-shadow);
+}
+
+:root {
+  /* Core variables are defined below in theme blocks */
+  --radius-xl: 1rem;
+  --radius-2xl: 1.5rem;
+
+  --shadow-glass: 0 8px 32px 0 rgba(31, 38, 135, 0.08);
+  --shadow-inner-soft: inset 0 2px 4px 0 rgba(0, 0, 0, 0.06);
+  --shadow-glow: 0 0 40px -10px var(--accent-color);
+
+  /* Smooth transition whenever JS updates a CSS var (template switch) */
+  transition:
+    background-color 0.4s ease,
+    color 0.4s ease;
+}
+
+/* Make every element inherit colour transitions */
+/* Optimized Transitions: Only apply to key interactive elements to boost scroll performance */
+button,
+a,
+input,
+select,
+textarea,
+.glass,
+.card,
+.premium-card,
+[role="button"] {
+  transition-property: background-color, border-color, color, box-shadow, opacity, transform;
+  transition-duration: 0.3s;
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Base body transition for theme switching */
+body {
+  transition: background-color 0.4s ease, color 0.4s ease;
+}
+
+/* Exception: don't force transitions on animations / transforms */
+[class*="animate-"],
+[class*="motion-"],
+.group,
+img,
+video {
+  transition-property: none;
+}
+
+/* ========================================
+   Skip to Main Content (WCAG 2.1 req.)
+   ======================================== */
+.skip-link {
+  position: absolute;
+  top: -100px;
+  left: 1rem;
+  z-index: 9999;
+  padding: 0.75rem 1.5rem;
+  background: var(--primary-color);
+  color: var(--primary-foreground);
+  font-weight: 800;
+  font-size: 0.9rem;
+  border-radius: 0 0 0.75rem 0.75rem;
+  text-decoration: none;
+  transition: top 0.2s ease;
+  white-space: nowrap;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
+}
+
+.skip-link:focus {
+  top: 0;
+  outline: 3px solid var(--accent-color);
+  outline-offset: 2px;
+}
+
+/* ========================================
+   Keyboard Focus Ring (WCAG 2.1)
+   ======================================== */
+:focus-visible {
+  outline: 2px solid var(--accent-color);
+  outline-offset: 3px;
+  border-radius: 4px;
+}
+
+/* ========================================
+   prefers-reduced-motion (WCAG 2.1 req.)
+   ======================================== */
+@media (prefers-reduced-motion: reduce) {
+
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+
+  .noise-overlay {
+    animation: none !important;
+  }
+
+  .premium-gradient {
+    animation: none !important;
+    background-position: 0% 50% !important;
+  }
+}
+
+/* ========================================
+   High Contrast Mode (Windows / prefers-contrast & User Toggle)
+   ======================================== */
+@media (prefers-contrast: high) {
+
+  :root,
+  [data-theme="datagov"] {
+    --accent-color: #0000cc;
+    --primary-color: #000000;
+    --foreground: #000000;
+    --background: #ffffff;
+    --accent-subtle: rgba(0, 0, 204, 0.1);
+  }
+
+  [data-theme="pdpa"] {
+    --accent-color: #005a2b;
+    --primary-color: #003018;
+  }
+
+  .glass,
+  .glass-dark {
+    background: var(--background) !important;
+    border: 2px solid var(--foreground) !important;
+    backdrop-filter: none !important;
+  }
+}
+
+html.high-contrast,
+html.high-contrast body {
+  /* Extreme High Contrast: Black Background, Yellow/White text */
+  --background: #000000 !important;
+  --foreground: #ffffff !important;
+  --primary-color: #000000 !important;
+  --primary-foreground: #ffffff !important;
+
+  --accent-color: #ffff00 !important;
+  --accent-dark: #b8b800 !important;
+  --accent-light: #ffff66 !important;
+  --accent-subtle: rgba(255, 255, 0, 0.15) !important;
+  --accent-glow: rgba(255, 255, 0, 0.25) !important;
+
+  --glass-bg: #000000 !important;
+  --glass-border: #ffff00 !important;
+  --text-muted: #cccccc !important;
+  --badge-bg: transparent !important;
+  --badge-text: #ffff00 !important;
+
+  background-color: var(--background) !important;
+  color: var(--foreground) !important;
+}
+
+html.high-contrast * {
+  border-color: #ffff00 !important;
+}
+
+html.high-contrast .glass,
+html.high-contrast .glass-dark {
+  background: var(--background) !important;
+  border: 2px solid var(--accent-color) !important;
+  backdrop-filter: none !important;
+  box-shadow: none !important;
+}
+
+html.high-contrast img,
+html.high-contrast video,
+html.high-contrast [style*="background-image"] {
+  filter: grayscale(100%) contrast(120%);
+}
+
+/* ========================================
+   DataGOV Theme (Excellence Blue)
+   Default theme
+   ======================================== */
+:root,
+[data-theme="datagov"] {
+  --background: #ffffff;
+  --foreground: #020617;
+  --primary-color: #0f172a;
+  /* Deep Slate Blue */
+  --primary-foreground: #ffffff;
+  --accent-color: #2563eb;
+  /* Royal Blue */
+  --accent-dark: #1e40af;
+  --accent-light: #60a5fa;
+  --accent-subtle: rgba(37, 99, 235, 0.06);
+  --accent-glow: rgba(37, 99, 235, 0.12);
+  --glass-bg: rgba(255, 255, 255, 0.82);
+  --glass-border: rgba(15, 23, 42, 0.08);
+  --text-muted: #64748b;
+  --premium-shadow: 0 25px 60px -12px rgba(15, 23, 42, 0.12);
+  --hero-gradient-from: #1e3a8a;
+  --hero-gradient-to: #1e40af;
+  --badge-bg: rgba(37, 99, 235, 0.08);
+  --badge-text: #1d4ed8;
+}
+
+/* ========================================
+   PDPA Theme (Trust Green)
+   ======================================== */
+[data-theme="pdpa"] {
+  --background: #ffffff;
+  --foreground: #020617;
+  --primary-color: #064e3b;
+  /* Very Deep Green */
+  --primary-foreground: #ffffff;
+  --accent-color: #10b981;
+  /* Emerald Green */
+  --accent-dark: #059669;
+  --accent-light: #34d399;
+  --accent-subtle: rgba(16, 185, 129, 0.06);
+  --accent-glow: rgba(16, 185, 129, 0.12);
+  --glass-bg: rgba(255, 255, 255, 0.82);
+  --glass-border: rgba(6, 78, 59, 0.08);
+  --text-muted: #475569;
+  --premium-shadow: 0 25px 60px -12px rgba(6, 78, 59, 0.12);
+  --hero-gradient-from: #064e3b;
+  --hero-gradient-to: #065f46;
+  --badge-bg: rgba(16, 185, 129, 0.08);
+  --badge-text: #047857;
+}
+
+/* ========================================
+   Dark Mode Variants
+   ======================================== */
+.dark,
+[class~="dark"] {
+  --background: #020617;
+  --foreground: #ffffff;
+  --primary-color: #f8fafc;
+  --primary-foreground: #020617;
+  --glass-bg: rgba(15, 23, 24, 0.8);
+  --glass-border: rgba(255, 255, 255, 0.1);
+  --text-muted: #cbd5e1;
+  --premium-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+}
+
+.dark[data-theme="datagov"],
+[class~="dark"][data-theme="datagov"] {
+  --accent-color: #60a5fa;
+  --accent-dark: #3b82f6;
+  --accent-light: #93c5fd;
+  --accent-subtle: rgba(96, 165, 250, 0.1);
+  --accent-glow: rgba(96, 165, 250, 0.2);
+  --badge-bg: rgba(96, 165, 250, 0.15);
+  --badge-text: #93c5fd;
+}
+
+.dark[data-theme="pdpa"],
+[class~="dark"][data-theme="pdpa"] {
+  --accent-color: #34d399;
+  --accent-dark: #10b981;
+  --accent-light: #6ee7b7;
+  --accent-subtle: rgba(52, 211, 153, 0.1);
+  --accent-glow: rgba(52, 211, 153, 0.2);
+  --badge-bg: rgba(52, 211, 153, 0.15);
+  --badge-text: #6ee7b7;
+}
+
+/* ========================================
+   Base Styles
+   ======================================== */
+@layer base {
+
+  html,
+  body {
+    background-color: var(--background);
+    color: var(--foreground);
+    transition: background-color 0.3s ease, color 0.3s ease;
+  }
+
+  body {
+    font-family: var(--font-sans);
+    min-height: 100vh;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    font-family: var(--font-heading);
+    letter-spacing: -0.025em;
+    font-weight: 800;
+    color: var(--foreground);
+  }
+}
+
+/* ========================================
+   Utility Classes
+   ======================================== */
+@layer utilities {
+  .glass {
+    background: var(--glass-bg);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border: 1px solid var(--glass-border);
+    box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.04);
+  }
+
+  .glass-dark {
+    background: rgba(15, 23, 42, 0.90);
+    backdrop-filter: blur(24px);
+    -webkit-backdrop-filter: blur(24px);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    box-shadow: 0 20px 40px -10px rgba(0, 0, 0, 0.3);
+  }
+
+  .premium-gradient {
+    background: linear-gradient(135deg, var(--accent-dark) 0%, var(--accent-color) 50%, var(--accent-light) 100%);
+    background-size: 200% 200%;
+    animation: gradient-shift 5s ease infinite;
+  }
+
+  @keyframes gradient-shift {
+    0% {
+      background-position: 0% 50%;
+    }
+
+    50% {
+      background-position: 100% 50%;
+    }
+
+    100% {
+      background-position: 0% 50%;
+    }
+  }
+
+  .scroll-mt-premium {
+    scroll-margin-top: 160px;
+  }
+
+  /* Themed text gradient */
+  .text-gradient {
+    background-image: linear-gradient(to right, var(--accent-dark), var(--accent-color));
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+
+  .dark .text-gradient {
+    background-image: linear-gradient(to right, var(--accent-light), var(--accent-color));
+  }
+
+  /* Themed accent background (subtle) */
+  .bg-accent-subtle {
+    background-color: var(--accent-subtle);
+  }
+
+  .bg-accent-glow {
+    background-color: var(--accent-glow);
+  }
+
+  /* Theme badge */
+  .badge-accent {
+    background-color: var(--badge-bg);
+    color: var(--badge-text);
+  }
+
+  /* Themed section backgrounds */
+  .section-white {
+    background-color: var(--background);
+    background-image: radial-gradient(at 0% 0%, var(--accent-subtle) 0, transparent 50%),
+      radial-gradient(at 50% 0%, var(--accent-subtle) 0, transparent 50%);
+  }
+
+  .section-mixed {
+    background-color: var(--background);
+    position: relative;
+    border-bottom: 1px solid var(--glass-border);
+  }
+
+  .noise-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    content: "";
+    opacity: 0.02;
+    z-index: 5;
+    pointer-events: none;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+    animation: noise-move 0.2s infinite;
+  }
+
+  @keyframes noise-move {
+    0% {
+      transform: translate(0, 0);
+    }
+
+    10% {
+      transform: translate(-1%, -1%);
+    }
+
+    20% {
+      transform: translate(-2%, 1%);
+    }
+
+    30% {
+      transform: translate(1%, -2%);
+    }
+
+    40% {
+      transform: translate(-1%, 2%);
+    }
+
+    50% {
+      transform: translate(-2%, -1%);
+    }
+
+    60% {
+      transform: translate(2%, 1%);
+    }
+
+    70% {
+      transform: translate(1%, 2%);
+    }
+
+    80% {
+      transform: translate(-2%, 1%);
+    }
+
+    90% {
+      transform: translate(1%, -1%);
+    }
+
+    100% {
+      transform: translate(0, 0);
+    }
+  }
+
+  .bg-cubes {
+    background-image: url('https://www.transparenttextures.com/patterns/cubes.png');
+  }
+}
+
+/* ========================================
+   Scrollbar (themed)
+   ======================================== */
+::-webkit-scrollbar {
+  width: 10px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--background);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--glass-border);
+  border-radius: 10px;
+  border: 3px solid var(--background);
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--accent-color);
+}
+
+/* ========================================
+   Scroll Progress (themed)
+   ======================================== */
+.scroll-progress {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: linear-gradient(to right, var(--accent-color), var(--accent-dark));
+  transform-origin: 0%;
+  z-index: 100;
+}
+
+/* ========================================
+   Tiptap Editor Styles
+   ======================================== */
+.ProseMirror {
+  outline: none;
+}
+
+.ProseMirror p {
+  margin: 0.5rem 0;
+}
+
+.ProseMirror h1 {
+  font-size: 1.875rem;
+  font-weight: 800;
+  margin: 1rem 0;
+  color: var(--primary-color);
+}
+
+.ProseMirror h2 {
+  font-size: 1.5rem;
+  font-weight: 700;
+  margin: 0.875rem 0;
+  color: var(--primary-color);
+}
+
+.ProseMirror ul,
+.ProseMirror ol {
+  padding-left: 1.5rem;
+  margin: 0.5rem 0;
+}
+
+.ProseMirror li {
+  margin: 0.25rem 0;
+}
+
+.ProseMirror blockquote {
+  border-left: 4px solid var(--accent-color);
+  padding-left: 1rem;
+  margin: 1rem 0;
+  font-style: italic;
+  color: var(--text-muted);
+}
+
+.ProseMirror pre {
+  background: #f1f5f9;
+  border-radius: 0.5rem;
+  padding: 1rem;
+  margin: 1rem 0;
+  overflow-x: auto;
+  font-family: 'Courier New', monospace;
+}
+
+.ProseMirror code {
+  background: #f1f5f9;
+  padding: 0.125rem 0.375rem;
+  border-radius: 0.25rem;
+  font-size: 0.875rem;
+  font-family: 'Courier New', monospace;
+}
+
+.ProseMirror img {
+  max-width: 100%;
+  height: auto;
+  border-radius: 0.5rem;
+  margin: 1rem 0;
+}
+
+.ProseMirror a {
+  color: var(--accent-color);
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+.ProseMirror a:hover {
+  color: var(--accent-color);
+  opacity: 0.8;
+}
+
+.ProseMirror p.is-editor-empty:first-child::before {
+  color: #adb5bd;
+  content: attr(data-placeholder);
+  float: left;
+  height: 0;
+  pointer-events: none;
+}
+
+/* Custom Scrollbar for Sidebar */
+.custom-scrollbar {
+  overscroll-behavior-y: contain;
+}
+
+.custom-scrollbar::-webkit-scrollbar {
+  width: 4px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background: rgba(0, 0, 0, 0.05);
+  border-radius: 10px;
+  border: none;
+}
+
+.custom-scrollbar:hover::-webkit-scrollbar-thumb {
+  background: rgba(0, 0, 0, 0.1);
+}
+
+/* Allow native rubber-banding overscroll effect */
+html.lenis-smooth,
+html.lenis-smooth body {
+  height: auto;
+  overscroll-behavior-y: auto;
+}
+
+/* ========================================
+   Legal Page Content (admin-rendered HTML)
+   ======================================== */
+.legal-content h1,
+.legal-content h2,
+.legal-content h3,
+.legal-content h4 {
+  font-family: var(--font-heading);
+  font-weight: 800;
+  color: var(--foreground);
+  margin-top: 2rem;
+  margin-bottom: 0.75rem;
+}
+
+.legal-content h1 {
+  font-size: 2rem;
+}
+
+.legal-content h2 {
+  font-size: 1.5rem;
+}
+
+.legal-content h3 {
+  font-size: 1.25rem;
+}
+
+.legal-content p {
+  line-height: 1.9;
+  margin-bottom: 1rem;
+  color: #374151;
+}
+
+.legal-content ul,
+.legal-content ol {
+  padding-left: 1.5rem;
+  margin-bottom: 1rem;
+}
+
+.legal-content li {
+  line-height: 1.8;
+  color: #374151;
+  margin-bottom: 0.25rem;
+}
+
+.legal-content a {
+  color: var(--accent-color);
+  text-decoration: underline;
+}
+
+.legal-content strong {
+  font-weight: 700;
+}
+
+.legal-content table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 1.5rem 0;
+}
+
+.legal-content th,
+.legal-content td {
+  border: 1px solid #e5e7eb;
+  padding: 0.75rem 1rem;
+  text-align: left;
+}
+
+.legal-content th {
+  background: #f9fafb;
+  font-weight: 700;
+}
+
+/* ========================================
+   Print Stylesheet
+   ======================================== */
+@media print {
+
+  /* ── Reset colors for ink economy ── */
+  *,
+  *::before,
+  *::after {
+    background: white !important;
+    color: black !important;
+    box-shadow: none !important;
+    text-shadow: none !important;
+  }
+
+  /* ── Page setup ── */
+  @page {
+    size: A4;
+    margin: 20mm 15mm 25mm 15mm;
+  }
+
+  @page :first {
+    margin-top: 15mm;
+  }
+
+  /* ── Hide all UI chrome ── */
+  nav,
+  header,
+  footer,
+  .print\:hidden,
+  [class*="NewsTicker"],
+  [class*="ChatWidget"],
+  [class*="CookieBanner"],
+  [class*="BackToTop"],
+  [class*="CustomCursor"],
+  [class*="ScrollProgress"],
+  [class*="ThemeToggle"],
+  button:not([data-print-show]),
+  .skip-link,
+  [aria-label="เมนูหลัก"],
+  [data-print-hide] {
+    display: none !important;
+  }
+
+  /* ── Main content ── */
+  body {
+    font-family: 'Sarabun', 'Tahoma', sans-serif !important;
+    font-size: 11pt;
+    line-height: 1.8;
+  }
+
+  main {
+    padding: 0 !important;
+    margin: 0 !important;
+  }
+
+  /* ── Legal page header (dark band → white for print) ── */
+  [style*="var(--primary-color)"] {
+    background: white !important;
+    color: black !important;
+    border-bottom: 2pt solid #000 !important;
+    padding: 8mm 0 6mm !important;
+  }
+
+  /* ── Typography ── */
+  h1 {
+    font-size: 18pt;
+    font-weight: 800;
+    margin-bottom: 6mm;
+  }
+
+  h2 {
+    font-size: 14pt;
+    font-weight: 700;
+    margin-top: 8mm;
+    margin-bottom: 4mm;
+  }
+
+  h3 {
+    font-size: 12pt;
+    font-weight: 600;
+    margin-top: 6mm;
+    margin-bottom: 3mm;
+  }
+
+  p {
+    margin-bottom: 4mm;
+    orphans: 3;
+    widows: 3;
+  }
+
+  /* ── Legal content ── */
+  .legal-content {
+    max-width: 100% !important;
+  }
+
+  .legal-content h1,
+  .legal-content h2,
+  .legal-content h3 {
+    page-break-after: avoid;
+  }
+
+  .legal-content table {
+    width: 100%;
+    border-collapse: collapse;
+    page-break-inside: avoid;
+  }
+
+  .legal-content th,
+  .legal-content td {
+    border: 0.5pt solid #333;
+    padding: 3mm 4mm;
+    font-size: 10pt;
+  }
+
+  /* ── Article / News page ── */
+  article {
+    border: none !important;
+    border-radius: 0 !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    box-shadow: none !important;
+  }
+
+  /* ── Images ── */
+  img {
+    max-width: 100% !important;
+    page-break-inside: avoid;
+    print-color-adjust: exact;
+  }
+
+  /* ── Links: show URL ── */
+  a[href^="http"]::after {
+    content: " (" attr(href) ")";
+    font-size: 8pt;
+    color: #555 !important;
+    font-style: italic;
+    word-break: break-all;
+  }
+
+  a[href^="/"]:not([href^="//"])::after {
+    content: "";
+  }
+
+  /* ── Breadcrumb ── */
+  nav[aria-label="Breadcrumb"] {
+    display: block !important;
+    font-size: 8pt;
+    color: #555 !important;
+    margin-bottom: 4mm;
+  }
+
+  /* ── Page number footer via CSS counter ── */
+  body::after {
+    content: "";
+    display: block;
+  }
+
+  /* ── Avoid orphaned headings ── */
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    page-break-after: avoid;
+    break-after: avoid;
+  }
+
+  /* ── Keep figures and tables together ── */
+  figure,
+  table,
+  blockquote {
+    page-break-inside: avoid;
+    break-inside: avoid;
+  }
+
+  /* ── Document footer line ── */
+  main>div:last-child {
+    border-top: 0.5pt solid #ccc !important;
+    padding-top: 4mm !important;
+    margin-top: 8mm !important;
+    font-size: 8pt !important;
+    color: #555 !important;
+  }
+}

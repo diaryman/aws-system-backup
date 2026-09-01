@@ -1,0 +1,9 @@
+streamlit
+boto3
+requests
+pandas
+reportlab
+matplotlib
+
+plotly
+wordcloud

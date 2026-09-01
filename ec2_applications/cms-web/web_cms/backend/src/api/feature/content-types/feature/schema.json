@@ -1,0 +1,48 @@
+{
+    "kind": "collectionType",
+    "collectionName": "features",
+    "info": {
+        "singularName": "feature",
+        "pluralName": "features",
+        "displayName": "Feature",
+        "description": "Dynamic content for Highlights, Principles, or Services sections."
+    },
+    "options": {
+        "draftAndPublish": true
+    },
+    "pluginOptions": {},
+    "attributes": {
+        "title": {
+            "type": "string",
+            "required": true
+        },
+        "description": {
+            "type": "text"
+        },
+        "icon": {
+            "type": "string",
+            "description": "Lucide icon name (e.g. Shield, FileText)"
+        },
+        "link": {
+            "type": "string"
+        },
+        "order": {
+            "type": "integer",
+            "default": 0
+        },
+        "domain": {
+            "type": "string",
+            "required": true,
+            "default": "localhost:3000"
+        },
+        "section": {
+            "type": "enumeration",
+            "enum": [
+                "Main Highlights",
+                "PDPA Principles",
+                "PDPA Stats"
+            ],
+            "default": "Main Highlights"
+        }
+    }
+}

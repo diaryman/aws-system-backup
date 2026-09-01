@@ -1,0 +1,760 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SLegalTools Legal Search Hub</title>
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Sarabun:ital,wght@0,300;0,400;0,600;0,700;1,400&family=Outfit:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+  <!-- Stylesheet -->
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body class="dark-theme"> <!-- Default to premium dark theme -->
+  
+  <div class="app-container">
+    <!-- Sidebar Navigation -->
+    <aside class="sidebar">
+      <div class="brand">
+        <span class="brand-logo">SL</span>
+        <div class="brand-info">
+          <span class="brand-name">SLegalTools</span>
+          <span class="brand-tag">Research Hub</span>
+        </div>
+      </div>
+      
+      <nav class="sidebar-nav">
+        <button class="nav-item active" data-target="deka-search">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>
+          ค้นคำพิพากษาฎีกา
+        </button>
+        <button class="nav-item" data-target="statute-search">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path></svg>
+          ค้นตัวบทกฎหมาย
+        </button>
+        <button class="nav-item" data-target="workspace">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path><line x1="12" y1="11" x2="12" y2="17"></line><line x1="9" y1="14" x2="15" y2="14"></line></svg>
+          Workspace & อ้างอิง
+          <span class="badge workspace-count" id="workspace-badge" style="display: none;">0</span>
+        </button>
+        <button class="nav-item" data-target="ai-chat">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
+          ผู้ช่วย AI (Bedrock)
+        </button>
+        <button class="nav-item" data-target="settings">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
+          ตั้งค่า & สถิติ
+        </button>
+      </nav>
+      
+      <div class="sidebar-footer">
+        <div class="theme-toggle-container">
+          <span class="label-text">โหมดมืด</span>
+          <label class="switch">
+            <input type="checkbox" id="theme-toggle" checked>
+            <span class="slider round"></span>
+          </label>
+        </div>
+        <div class="font-size-controls">
+          <span class="label-text">ขนาดอักษร</span>
+          <div class="font-size-buttons">
+            <button id="font-dec" title="ลดขนาดตัวอักษร">A-</button>
+            <button id="font-inc" title="เพิ่มขนาดตัวอักษร">A+</button>
+          </div>
+        </div>
+      </div>
+    </aside>
+
+    <!-- Main Content Area -->
+    <main class="main-content">
+      
+      <!-- Section: Deka Search -->
+      <section id="deka-search-section" class="content-section active">
+        <header class="section-header">
+          <div>
+            <h1>ค้นคำพิพากษาศาลฎีกา</h1>
+            <p class="subtitle">สืบค้นระบบคำพิพากษาศาลฎีกาและฎีกาฉบับย่อ/เต็ม ด้วยระบบสัจจะและ AI อัจฉริยะ</p>
+          </div>
+          <div class="header-badge">Deka Engine v2.0</div>
+        </header>
+
+        <!-- Search Mode Tabs -->
+        <div class="search-tabs">
+          <button class="tab-btn active" data-mode="ai">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather"><polygon points="12 2 2 7 12 12 22 7 12 2"></polygon><polyline points="2 17 12 22 22 17"></polyline><polyline points="2 12 12 17 22 12"></polyline></svg>
+            AI Search
+          </button>
+          <button class="tab-btn" data-mode="text">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><line x1="9" y1="9" x2="15" y2="9"></line><line x1="9" y1="13" x2="15" y2="13"></line><line x1="9" y1="17" x2="13" y2="17"></line></svg>
+            ค้นด้วยคำสำคัญ & ฟิลเตอร์
+          </button>
+          <button class="tab-btn" data-mode="law">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
+            ค้นตามตัวบท & มาตรา
+          </button>
+        </div>
+
+        <!-- Search Forms Containers -->
+        <div class="search-form-card card">
+          <!-- AI Search Form -->
+          <form id="ai-search-form" class="search-form active">
+            <div class="form-group full-width">
+              <label for="ai-question">ถามด้วยภาษาธรรมชาติ (ข้อเท็จจริง ประเด็น หรือข้อสงสัยทางกฎหมาย)</label>
+              <div class="search-input-wrapper">
+                <textarea id="ai-question" placeholder="เช่น ตัวแทนโบรคเกอร์ มีความรับผิดอย่างไรเมื่อไม่มีอำนาจทำการแทน หรือ การผิดสัญญาจำนองต้องบอกกล่าวล่วงหน้ากี่วัน..." rows="2" required></textarea>
+                <button type="submit" class="btn btn-primary btn-search">
+                  <span>ค้นหาด้วย AI</span>
+                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+                </button>
+              </div>
+            </div>
+            <div class="form-row">
+              <div class="form-group">
+                <label for="ai-top_k">จำนวนผลลัพธ์สูงสุด</label>
+                <select id="ai-top_k">
+                  <option value="5">5 รายการ</option>
+                  <option value="10" selected>10 รายการ</option>
+                  <option value="15">15 รายการ</option>
+                  <option value="20">20 รายการ</option>
+                </select>
+              </div>
+            </div>
+          </form>
+
+          <!-- Text Search Form -->
+          <form id="text-search-form" class="search-form">
+            <div class="form-group full-width">
+              <label for="text-query">คำสำคัญ / เลขฎีกา / ข้อความค้นหา</label>
+              <div class="search-input-wrapper">
+                <input type="text" id="text-query" placeholder="เช่น ดอกเบี้ยเกินอัตรา, 2289/2568, ครอบครองปรปักษ์..." required>
+                <button type="submit" class="btn btn-primary btn-search">
+                  <span>ค้นหา</span>
+                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+                </button>
+              </div>
+            </div>
+            
+            <div class="form-grid">
+              <div class="form-group">
+                <label for="text-law_code">รหัสกฎหมายอ้างอิง (เช่น ป.พ.พ.)</label>
+                <input type="text" id="text-law_code" placeholder="เช่น ป.พ.พ., ป.อ., ป.วิ.พ.">
+              </div>
+              <div class="form-group">
+                <label for="text-sections">มาตรา (คั่นด้วยจุลภาค เช่น 353, 354)</label>
+                <input type="text" id="text-sections" placeholder="เช่น 150, 420">
+              </div>
+              <div class="form-group">
+                <label for="text-year_from">จากปี พ.ศ. (เช่น 2550)</label>
+                <input type="number" id="text-year_from" min="2450" max="2600" placeholder="พ.ศ. เริ่มต้น">
+              </div>
+              <div class="form-group">
+                <label for="text-year_to">ถึงปี พ.ศ. (เช่น 2568)</label>
+                <input type="number" id="text-year_to" min="2450" max="2600" placeholder="พ.ศ. สิ้นสุด">
+              </div>
+              <div class="form-group">
+                <label for="text-doc_type">ประเภทเอกสาร</label>
+                <select id="text-doc_type">
+                  <option value="">ทั้งหมด</option>
+                  <option value="คำพิพากษา">คำพิพากษา</option>
+                  <option value="คำสั่ง">คำสั่ง</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label for="text-top_k">จำนวนผลลัพธ์สูงสุด</label>
+                <select id="text-top_k">
+                  <option value="5">5 รายการ</option>
+                  <option value="10" selected>10 รายการ</option>
+                  <option value="15">15 รายการ</option>
+                  <option value="20">20 รายการ</option>
+                </select>
+              </div>
+            </div>
+          </form>
+
+          <!-- Law Search Form -->
+          <form id="law-search-form" class="search-form">
+            <div class="form-grid">
+              <div class="form-group">
+                <label for="law-code-input">ประมวล/กฎหมาย (ต้องระบุ)</label>
+                <input type="text" id="law-code-input" placeholder="เช่น ป.พ.พ., ป.อ., ป.วิ.อ." required>
+              </div>
+              <div class="form-group">
+                <label for="law-sections-input">มาตรา (คั่นด้วยจุลภาค เช่น 420, 438)</label>
+                <input type="text" id="law-sections-input" placeholder="เช่น 420">
+              </div>
+              <div class="form-group">
+                <label for="law-provision-type">ประเภทบทบัญญัติ (ไม่บังคับ)</label>
+                <input type="text" id="law-provision-type" placeholder="เช่น ความผิดลหุโทษ">
+              </div>
+              <div class="form-group">
+                <label for="law-top_k">จำนวนผลลัพธ์สูงสุด</label>
+                <select id="law-top_k">
+                  <option value="5">5 รายการ</option>
+                  <option value="10" selected>10 รายการ</option>
+                  <option value="15">15 รายการ</option>
+                  <option value="20">20 รายการ</option>
+                </select>
+              </div>
+            </div>
+            <div class="form-actions">
+              <button type="submit" class="btn btn-primary">
+                <span>ค้นหาตามมาตรา</span>
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+              </button>
+            </div>
+          </form>
+        </div>
+
+        <!-- Search Results -->
+        <div class="results-container">
+          <div class="results-header" style="display: none;">
+            <h2 id="results-count-text">พบผลลัพธ์ 0 รายการ</h2>
+            <div class="results-actions">
+              <!-- Actions if any -->
+            </div>
+          </div>
+          
+          <div class="loading-state" id="search-loading" style="display: none;">
+            <div class="spinner"></div>
+            <p>กำลังค้นหาข้อมูลจากระบบฐานคดีกฎหมาย...</p>
+          </div>
+
+          <div class="empty-state" id="search-empty">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="feather"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+            <h3>ยังไม่ได้เริ่มค้นหา</h3>
+            <p>กรอกคำค้นด้านบนแล้วระบบจะแสดงผลลัพธ์ฎีกาที่เกี่ยวข้องในทันที</p>
+          </div>
+
+          <div class="results-list" id="search-results-list">
+            <!-- Results cards dynamically injected here -->
+          </div>
+        </div>
+      </section>
+      
+      <!-- Section: Statute Search -->
+      <section id="statute-search-section" class="content-section">
+        <header class="section-header">
+          <div>
+            <h1>สืบค้นตัวบทกฎหมาย (OCS)</h1>
+            <p class="subtitle">ค้นหาประมวลกฎหมาย มาตรา รายละเอียดสารบัญประวัติ และเนื้อหาจากฐานข้อมูลคณะกรรมการกฤษฎีกา</p>
+          </div>
+          <div class="header-badge orange">Statute Engine v2.0</div>
+        </header>
+
+        <div class="search-tabs">
+          <button class="statute-tab-btn active" data-statute-mode="laws">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path></svg>
+            ค้นหารายพระราชบัญญัติ / ประมวล
+          </button>
+          <button class="statute-tab-btn" data-statute-mode="sections">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
+            ค้นหาตัวบท / มาตรา (FTS)
+          </button>
+          <button class="statute-tab-btn" data-statute-mode="history">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+            ประวัติการแก้ไขและสถานะกฎหมาย
+          </button>
+        </div>
+
+        <div class="search-form-card card">
+          <!-- Search Laws Form -->
+          <form id="statute-laws-form" class="statute-form active">
+            <div class="form-grid">
+              <div class="form-group">
+                <label for="statute-laws-query">คำค้นหาชื่อกฎหมาย (เช่น แพ่ง, อาญา, ล้มละลาย)</label>
+                <input type="text" id="statute-laws-query" placeholder="ระบุบางส่วนของชื่อกฎหมาย หรือรหัสย่อ...">
+              </div>
+              <div class="form-group">
+                <label for="statute-laws-scope">ขอบเขตกฎหมาย</label>
+                <select id="statute-laws-scope">
+                  <option value="all">ทั้งหมด</option>
+                  <option value="primary" selected>กฎหมายแม่บท (Primary Laws)</option>
+                  <option value="sublaw">กฎหมายลำดับรอง (Sublaws)</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label for="statute-laws-lifecycle">สถานะการบังคับใช้</label>
+                <select id="statute-laws-lifecycle">
+                  <option value="current_or_future" selected>มีผลบังคับใช้ปัจจุบัน/อนาคต</option>
+                  <option value="active_listing">ประกาศแล้ว</option>
+                  <option value="cancelled">ยกเลิกแล้ว</option>
+                  <option value="all">ทั้งหมด</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label for="statute-laws-top_k">จำนวนผลลัพธ์สูงสุด</label>
+                <select id="statute-laws-top_k">
+                  <option value="5">5 รายการ</option>
+                  <option value="10" selected>10 รายการ</option>
+                  <option value="15">15 รายการ</option>
+                  <option value="20">20 รายการ</option>
+                </select>
+              </div>
+            </div>
+            <div class="form-actions">
+              <button type="submit" class="btn btn-primary">
+                <span>ค้นหาพระราชบัญญัติ</span>
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+              </button>
+            </div>
+          </form>
+
+          <!-- Search Sections Form -->
+          <form id="statute-sections-form" class="statute-form">
+            <div class="form-group full-width">
+              <label for="statute-sections-query">ค้นหาคำค้นจากเนื้อหามาตรา (Full-Text Search)</label>
+              <div class="search-input-wrapper">
+                <textarea id="statute-sections-query" placeholder="เช่น ดอกเบี้ยร้อยละสิบห้าต่อปี, การหมิ่นประมาททางอิเล็กทรอนิกส์, ความรับผิดของผู้ส่งสินค้า..." rows="2" required></textarea>
+                <button type="submit" class="btn btn-primary btn-search">
+                  <span>ค้นหามาตรา</span>
+                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+                </button>
+              </div>
+            </div>
+            <div class="form-grid">
+              <div class="form-group">
+                <label for="statute-sections-law_code">รหัสกฎหมายอ้างอิง (ระบุเพื่อจำกัดวง)</label>
+                <input type="text" id="statute-sections-law_code" placeholder="เช่น ป.พ.พ.">
+              </div>
+              <div class="form-group">
+                <label for="statute-sections-section_no">เฉพาะเลขมาตรา</label>
+                <input type="text" id="statute-sections-section_no" placeholder="เช่น 420 หรือ 15">
+              </div>
+              <div class="form-group">
+                <label for="statute-sections-scope">ขอบเขตกฎหมาย</label>
+                <select id="statute-sections-scope">
+                  <option value="all" selected>ทั้งหมด</option>
+                  <option value="primary">กฎหมายแม่บท</option>
+                  <option value="sublaw">กฎหมายลำดับรอง</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label for="statute-sections-top_k">จำนวนผลลัพธ์สูงสุด</label>
+                <select id="statute-sections-top_k">
+                  <option value="5">5 รายการ</option>
+                  <option value="10" selected>10 รายการ</option>
+                  <option value="15">15 รายการ</option>
+                  <option value="20">20 รายการ</option>
+                </select>
+              </div>
+            </div>
+          </form>
+
+          <!-- Search History Form -->
+          <form id="statute-history-form" class="statute-form">
+            <div class="form-grid">
+              <div class="form-group">
+                <label for="statute-history-query">ชื่อกฎหมาย / หัวข้อกฎหมาย</label>
+                <input type="text" id="statute-history-query" placeholder="เช่น พระราชบัญญัติหลักทรัพย์..." required>
+              </div>
+              <div class="form-group">
+                <label for="statute-history-law_code">รหัสกฎหมาย</label>
+                <input type="text" id="statute-history-law_code" placeholder="เช่น พ.ร.บ.หลักทรัพย์และตลาดหลักทรัพย์">
+              </div>
+              <div class="form-group">
+                <label for="statute-history-lifecycle">ประเภทประวัติที่ค้นหา</label>
+                <select id="statute-history-lifecycle">
+                  <option value="all" selected>ทั้งหมด</option>
+                  <option value="history">ประวัติการแก้ไขเท่านั้น</option>
+                  <option value="current_or_future">ปัจจุบันและอนาคต</option>
+                  <option value="cancelled">ยกเลิกแล้ว</option>
+                  <option value="amendment_or_related">การเชื่อมโยงการแก้ไข</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label for="statute-history-top_k">จำนวนผลลัพธ์</label>
+                <select id="statute-history-top_k">
+                  <option value="5">5 รายการ</option>
+                  <option value="10" selected>10 รายการ</option>
+                  <option value="20">20 รายการ</option>
+                </select>
+              </div>
+            </div>
+            <div class="form-actions">
+              <button type="submit" class="btn btn-primary">
+                <span>ค้นประวัติกฎหมาย</span>
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+              </button>
+            </div>
+          </form>
+        </div>
+
+        <div class="results-container">
+          <div class="loading-state" id="statute-loading" style="display: none;">
+            <div class="spinner"></div>
+            <p>กำลังค้นหาข้อมูลตัวบทกฎหมายกฤษฎีกา...</p>
+          </div>
+
+          <div class="empty-state" id="statute-empty">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="feather"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path></svg>
+            <h3>ยังไม่มีการค้นหาตัวบท</h3>
+            <p>เลือกแท็บค้นหาและพิมพ์คำค้นหาที่คุณต้องการเพื่อแสดงข้อมูลตัวบทมาตรา</p>
+          </div>
+
+          <div class="results-list" id="statute-results-list">
+            <!-- Statute search results injected here -->
+          </div>
+        </div>
+      </section>
+
+      <!-- Section: Workspace -->
+      <section id="workspace-section" class="content-section">
+        <header class="section-header">
+          <div>
+            <h1>กล่องเตรียมเอกสาร (Workspace & Citation Pack)</h1>
+            <p class="subtitle">รวบรวมคำพิพากษาฎีกาที่คุณสนใจ นำมาระบุประเด็นข้อพิพาท เพื่อให้ AI สรุปและสร้างเอกสารแพ็กเกจอ้างอิงคดีความ</p>
+          </div>
+          <div class="header-badge purple">Workspace Hub</div>
+        </header>
+
+        <div class="workspace-grid">
+          <!-- Left: Collected Deka Cases -->
+          <div class="card workspace-cases-card">
+            <h2>คดีที่รวบรวมไว้ (<span id="workspace-total-count">0</span> คดี)</h2>
+            <p class="section-desc">คดีเหล่านี้จะถูกส่งไปประมวลผลเพื่อทำเป็นชุดสรุปประเด็นอ้างอิง</p>
+            
+            <div class="workspace-list" id="workspace-cases-list">
+              <div class="empty-state mini">
+                <p>ยังไม่มีคดีในรายการอ้างอิงของคุณ</p>
+                <p class="small">ย้อนกลับไปค้นหาคำพิพากษาศาลฎีกาแล้วกดปุ่ม "เพิ่มลง Workspace" เพื่อเริ่มรวบรวมคดี</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Right: Citation Form and Export -->
+          <div class="card workspace-form-card">
+            <h2>สร้าง Citation Pack</h2>
+            <p class="section-desc">กรอกข้อมูลบริบทของคดีของคุณเพื่อจัดระเบียบการอ้างอิงคำพิพากษา</p>
+            
+            <form id="citation-pack-form">
+              <div class="form-group">
+                <label for="cite-issue">ประเด็นปัญหาข้อกฎหมายข้อพิพาท (Issue)</label>
+                <textarea id="cite-issue" placeholder="เช่น การทำสัญญาแต่งตั้งตัวแทนโดยไม่มีหนังสือมอบอำนาจ จะถือว่าเป็นตัวแทนเชิดและมีผลผูกพันตัวการหรือไม่..." rows="3"></textarea>
+              </div>
+              <div class="form-group">
+                <label for="cite-facts">ข้อเท็จจริงในคดีโดยย่อ (Facts)</label>
+                <textarea id="cite-facts" placeholder="เช่น จำเลยเป็นนายหน้าเสนอขายหลักทรัพย์ของโจทก์ ต่อมาได้รับเงินลงทุนจากผู้ประสงค์ซื้อไปแต่ไม่ส่งให้โจทก์ โจทก์ฟ้องร้องจำเลยฐานผิดสัญญาและละเมิด..." rows="4"></textarea>
+              </div>
+              
+              <div class="form-checkbox-row">
+                <label class="checkbox-container">
+                  <input type="checkbox" id="cite-include-long" checked>
+                  <span class="checkmark"></span>
+                  แนบเนื้อหาคำพิพากษาฎีกาฉบับยาวในเอกสารผลลัพธ์
+                </label>
+              </div>
+
+              <div class="form-group">
+                <label for="cite-char-limit">จำนวนตัวอักษรสูงสุดต่อหนึ่งคดี</label>
+                <select id="cite-char-limit">
+                  <option value="5000">5,000 ตัวอักษร (กระชับ)</option>
+                  <option value="10000">10,000 ตัวอักษร</option>
+                  <option value="20000" selected>20,000 ตัวอักษร (มาตรฐาน)</option>
+                  <option value="30000">30,000 ตัวอักษร (ละเอียดมาก)</option>
+                </select>
+              </div>
+
+              <div class="form-group">
+                <label>เทคโนโลยี AI ในการเรียบเรียงสรุป</label>
+                <div class="engine-radios-row" style="display: flex; gap: 16px; margin-top: 6px;">
+                  <label class="radio-container" style="display: flex; align-items: center; gap: 6px; cursor: pointer;">
+                    <input type="radio" name="cite-engine" value="slegaltools" checked style="width: auto; min-height: auto;">
+                    <span>SLegalTools AI</span>
+                  </label>
+                  <label class="radio-container" style="display: flex; align-items: center; gap: 6px; cursor: pointer;">
+                    <input type="radio" name="cite-engine" value="bedrock" style="width: auto; min-height: auto;">
+                    <span>AWS Bedrock (Claude)</span>
+                  </label>
+                </div>
+              </div>
+
+              <button type="submit" class="btn btn-purple btn-block" id="btn-build-citation" disabled>
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
+                สร้างชุดเอกสารอ้างอิงคดี
+              </button>
+            </form>
+          </div>
+        </div>
+
+        <!-- Citation Pack Results -->
+        <div class="citation-results-container card" id="citation-result-card" style="display: none;">
+          <div class="citation-results-header">
+            <h3>ชุดข้อมูลสรุปและอ้างอิงฎีกา (Citation Pack)</h3>
+            <div class="citation-header-actions" style="display: flex; gap: 8px;">
+              <button class="btn btn-secondary btn-sm" id="btn-copy-citation">คัดลอกทั้งหมด</button>
+              <button class="btn btn-purple btn-sm" id="btn-download-citation">ดาวน์โหลด Word (.doc)</button>
+            </div>
+          </div>
+          <div class="loading-state" id="citation-loading" style="display: none;">
+            <div class="spinner"></div>
+            <p>กำลังวิเคราะห์ประเด็นกฎหมายและจัดเตรียมเอกสารอ้างอิง...</p>
+          </div>
+          <div class="citation-content-output" id="citation-output">
+            <!-- Formatted citation markdown/HTML output -->
+          </div>
+        </div>
+      </section>
+
+      <!-- Section: AI Chat Assistant (Bedrock) -->
+      <section id="ai-chat-section" class="content-section">
+        <header class="section-header">
+          <div>
+            <h1>ถาม-ตอบ AI กฎหมายอัจฉริยะ (AWS Bedrock)</h1>
+            <p class="subtitle">สนทนากับ AI เพื่อวิเคราะห์ปัญหากฎหมาย แนะนำข้อต่อสู้ และช่วยสรุปคำพิพากษาโดยอิงตามบริบทคดีความของคุณ</p>
+          </div>
+          <div class="header-badge orange">AWS Bedrock Active</div>
+        </header>
+
+        <div class="chat-container-layout">
+          <!-- Chat Configurations Sidebar (Left) -->
+          <div class="card chat-options-card">
+            <h2>ตั้งค่าผู้ช่วย AI</h2>
+            <p class="section-desc">กำหนดโมเดลและขอบเขตข้อมูลที่ต้องการให้ AI นำมาร่วมพิจารณา</p>
+            
+            <div class="form-group">
+              <label for="chat-model-select">โมเดล AI ของ AWS</label>
+              <select id="chat-model-select">
+                <option value="us.anthropic.claude-sonnet-4-20250514-v1:0" selected>US Claude Sonnet 4 (แนะนำ)</option>
+                <option value="us.amazon.nova-pro-v1:0">US Nova Pro (รวดเร็ว/ประหยัด)</option>
+                <option value="us.anthropic.claude-3-5-haiku-20241022-v1:0">US Claude 3.5 Haiku (เร็วที่สุด)</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label for="chat-context-source">แหล่งข้อมูลอ้างอิงบริบท (Context)</label>
+              <select id="chat-context-source">
+                <option value="none" selected>🌐 ความรู้ทั่วไปของโมเดล (ไม่มีคดีอ้างอิง)</option>
+                <option value="workspace">🗂️ ใช้คดีทั้งหมดใน Workspace เป็นบริบท</option>
+                <option value="active-drawer">📖 ใช้คดีที่เปิดอ่านล่าสุดเป็นบริบท</option>
+              </select>
+              <p class="help-text" id="chat-context-help">โมเดลจะคุยโดยใช้ความรู้ทั่วไปเกี่ยวกับกฎหมายไทย</p>
+            </div>
+
+            <div class="form-group">
+              <label for="chat-temperature">อุณหภูมิความคิดสร้างสรรค์ (Temperature)</label>
+              <div class="range-container">
+                <input type="range" id="chat-temperature" min="0.0" max="1.0" step="0.1" value="0.3">
+                <span id="chat-temp-val">0.3</span>
+              </div>
+              <p class="help-text">ค่าน้อย = เน้นหลักการกฎหมายและความถูกต้อง, ค่ามาก = เน้นการเรียบเรียงประยุกต์</p>
+            </div>
+
+            <button class="btn btn-danger-outline btn-block" id="btn-clear-chat">
+              ล้างประวัติการคุย
+            </button>
+          </div>
+
+          <!-- Chat Window Arena (Right) -->
+          <div class="card chat-arena-card">
+            <div class="chat-header">
+              <div class="chat-status-indicator">
+                <span class="status-dot-active blinking"></span>
+                <span id="chat-status-text">พร้อมรับคำถาม...</span>
+              </div>
+              <div class="active-context-pill" id="chat-active-context-indicator" style="display: none;">
+                บริบท: คดีใน Workspace
+              </div>
+            </div>
+
+            <!-- Messages List -->
+            <div class="chat-messages" id="chat-messages-box">
+              <div class="message system-msg">
+                <div class="message-bubble">
+                  สวัสดีครับ! ผมคือ **AI ผู้ช่วยกฎหมายไทยอัจฉริยะ (AWS Bedrock)** ⚖️<br><br>
+                  คุณสามารถปรึกษาข้อกฎหมาย หรือปรับตัวเลือกทางด้านซ้ายเพื่อนำข้อมูลคดีที่คุณกำลังรวบรวมใน **Workspace** หรือคดีที่กำลังเปิดอ่านอยู่ มาป้อนเป็นบริบทเพื่อให้ผมช่วยวิเคราะห์แนวทางสู้คดีหรือเขียนร่างคำฟ้องได้ครับ<br><br>
+                  *กรุณาระบุคำถามหรือประเด็นทางกฎหมายที่คุณต้องการตรวจสอบด้านล่างนี้ได้เลยครับ:*
+                </div>
+              </div>
+            </div>
+
+            <!-- Input Bar -->
+            <form id="chat-input-form" class="chat-input-area">
+              <div class="input-wrapper">
+                <textarea id="chat-user-input" placeholder="พิมพ์คำถามกฎหมายที่ต้องการถาม หรือขอคำปรึกษาคดีความได้ที่นี่..." rows="1" required></textarea>
+                <button type="submit" class="btn btn-primary" id="btn-send-chat" title="ส่งคำถาม">
+                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </section>
+
+      <!-- Section: Settings -->
+      <section id="settings-section" class="content-section">
+        <header class="section-header">
+          <div>
+            <h1>ตั้งค่าระบบและสถิติ (Settings & Statistics)</h1>
+            <p class="subtitle">จัดการ API Key คอนฟิกูเรชันความปลอดภัย และดูขนาดคลังข้อมูลที่ระบบมีอยู่ในขณะนี้</p>
+          </div>
+          <div class="header-badge green">Settings</div>
+        </header>
+
+        <div class="settings-grid">
+          <!-- API Configuration Card -->
+          <div class="card">
+            <h2>การตั้งค่า API Key</h2>
+            <p class="section-desc">ระบบทำงานโดยดึงข้อมูลผ่าน API ของ SLegalTools คุณสามารถใช้คีย์ส่วนตัวเพื่อสิทธิพิเศษและการเก็บประวัติส่วนบุคคล</p>
+            
+            <div class="form-group">
+              <label for="settings-api-key">SLegalTools API Key</label>
+              <div class="api-key-input-row">
+                <input type="password" id="settings-api-key" placeholder="กรอก API key ของคุณ (deka_user_...)">
+                <button class="btn btn-secondary" id="btn-toggle-key-visibility">แสดงคีย์</button>
+              </div>
+              <p class="help-text">หากใส่ค่าไว้ คีย์นี้จะจัดเก็บอย่างปลอดภัยบนเบราว์เซอร์ของคุณ (LocalStorage) และมีสิทธิ์สูงกว่าคีย์กลางของเซิร์ฟเวอร์</p>
+            </div>
+            
+            <div class="settings-actions">
+              <button class="btn btn-primary" id="btn-save-settings">บันทึกข้อมูลตั้งค่า</button>
+              <button class="btn btn-danger-outline" id="btn-clear-settings">ล้างค่าคีย์</button>
+            </div>
+
+            <div class="api-status-banner success" id="api-status-active" style="display: none;">
+              <span class="status-dot"></span> เชื่อมต่อ API ได้ปกติด้วยคีย์ผู้ใช้
+            </div>
+            <div class="api-status-banner warning" id="api-status-server">
+              <span class="status-dot"></span> กำลังใช้ API Key กลางจากไฟล์คอนฟิกูเรชันฝั่งเซิร์ฟเวอร์
+            </div>
+          </div>
+
+          <!-- AWS Bedrock Configuration Card -->
+          <div class="card">
+            <h2>การเชื่อมต่อ AWS Bedrock</h2>
+            <p class="section-desc">ตรวจสอบการยืนยันตัวตนและการเข้าถึงคลังโมเดล AI ของ AWS Bedrock จากคอมพิวเตอร์ของคุณ</p>
+            
+            <div class="aws-status-info">
+              <div class="status-row">
+                <span class="status-label">สถานะ AWS Bedrock:</span>
+                <span class="status-value badge success" id="settings-aws-status" style="display: inline-block;">กำลังตรวจสอบ...</span>
+              </div>
+              <div class="status-row">
+                <span class="status-label">AWS Account:</span>
+                <span class="status-value" id="settings-aws-account">-</span>
+              </div>
+              <div class="status-row">
+                <span class="status-label">IAM User (ARN):</span>
+                <span class="status-value text-small" id="settings-aws-arn" style="font-family: var(--font-en); font-size: 11px; overflow-wrap: break-word; max-width: 100%; word-break: break-all;">-</span>
+              </div>
+              <div class="status-row">
+                <span class="status-label">AWS Region:</span>
+                <span class="status-value" id="settings-aws-region">-</span>
+              </div>
+            </div>
+            
+            <div class="form-group" style="margin-top: 18px;">
+              <label for="settings-default-bedrock-model">โมเดล AI เริ่มต้นสำหรับเอกสาร</label>
+              <select id="settings-default-bedrock-model">
+                <option value="us.anthropic.claude-sonnet-4-20250514-v1:0" selected>US Claude Sonnet 4 (แนะนำ)</option>
+                <option value="us.amazon.nova-pro-v1:0">US Nova Pro</option>
+                <option value="us.anthropic.claude-3-5-haiku-20241022-v1:0">US Claude 3.5 Haiku</option>
+              </select>
+              <p class="help-text">ใช้ในการเรียบเรียงวิเคราะห์ประเด็นเพื่อสร้าง Citation Pack</p>
+            </div>
+          </div>
+
+          <!-- User Manual Card -->
+          <div class="card">
+            <h2>คู่มือการใช้งาน & เอกสาร</h2>
+            <p class="section-desc">ดาวน์โหลดคู่มือการใช้งานระบบ Legal Search Hub ฉบับเต็มเพื่อศึกษาการใช้งานฟีเจอร์ต่างๆ อย่างละเอียด</p>
+            <div style="margin-top: auto; padding-top: 15px;">
+              <a href="/manual.pdf" download class="btn btn-purple" style="display: inline-flex; align-items: center; justify-content: center; gap: 8px; text-decoration: none; text-align: center; width: 100%; box-sizing: border-box;">
+                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+                ดาวน์โหลดคู่มือการใช้งาน (PDF)
+              </a>
+            </div>
+          </div>
+
+          <!-- Statistics & System Info -->
+          <div class="card">
+            <h2>ขนาดคลังข้อมูล (Corpus Statistics)</h2>
+            <p class="section-desc">สถิติจำนวนเอกสารคำพิพากษาศาลฎีกาและมาตรากฎหมาย OCS ที่พร้อมใช้งานในระบบขณะนี้</p>
+            
+            <div class="stats-loading" id="stats-loading">
+              <div class="spinner spinner-sm"></div> กำลังดึงข้อมูลสถิติจากระบบคลาวด์...
+            </div>
+            
+            <div class="stats-grid" id="stats-grid" style="display: none;">
+              <!-- Stats widgets dynamically filled -->
+              <div class="stats-widget">
+                <span class="stats-label">คำพิพากษาฎีกาทั้งหมด</span>
+                <span class="stats-value" id="stat-deka-count">0</span>
+              </div>
+              <div class="stats-widget">
+                <span class="stats-label">ประมวลกฎหมาย (OCS)</span>
+                <span class="stats-value" id="stat-laws-count">0</span>
+              </div>
+              <div class="stats-widget">
+                <span class="stats-label">จำนวนมาตราตัวบท</span>
+                <span class="stats-value" id="stat-sections-count">0</span>
+              </div>
+              <div class="stats-widget">
+                <span class="stats-label">ประวัติการแก้ไขกฎหมาย</span>
+                <span class="stats-value" id="stat-history-count">0</span>
+              </div>
+            </div>
+            <div class="stats-footer-note" id="stats-date" style="display: none;">
+              ข้อมูลอัปเดตแบบเรียลไทม์ผ่าน API
+            </div>
+          </div>
+        </div>
+      </section>
+
+    </main>
+
+    <!-- Side Drawer: Document Viewer -->
+    <div class="backdrop" id="viewer-backdrop"></div>
+    <div class="viewer-drawer" id="viewer-drawer">
+      <div class="drawer-header">
+        <div class="drawer-header-left">
+          <span class="drawer-doc-type-badge" id="viewer-badge">คำพิพากษาศาลฎีกา</span>
+          <h2 class="drawer-title" id="viewer-title">ฎีกาที่ 2289/2568</h2>
+        </div>
+        <button class="drawer-close-btn" id="btn-close-viewer" title="ปิดหน้าต่าง">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+        </button>
+      </div>
+
+      <div class="drawer-toolbar">
+        <div class="toolbar-left">
+          <button class="btn btn-sm btn-secondary" id="btn-copy-drawer-text">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+            คัดลอกเนื้อหา
+          </button>
+          <button class="btn btn-sm btn-secondary" id="btn-download-drawer-text" title="ดาวน์โหลดเป็นไฟล์ MS Word">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+            ดาวน์โหลด (.doc)
+          </button>
+          <button class="btn btn-sm btn-purple" id="btn-drawer-add-workspace">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+            เพิ่มใน Workspace
+          </button>
+        </div>
+        <div class="toolbar-right">
+          <span class="zoom-label">ขนาดอักษร:</span>
+          <button class="zoom-btn" id="viewer-font-dec">A-</button>
+          <button class="zoom-btn" id="viewer-font-inc">A+</button>
+        </div>
+      </div>
+
+      <div class="drawer-content-container" id="viewer-scroll-container">
+        <!-- Loader inside drawer -->
+        <div class="drawer-loading" id="viewer-loading" style="display: none;">
+          <div class="spinner"></div>
+          <p>กำลังโหลดรายละเอียดเอกสารฉบับเต็ม...</p>
+        </div>
+        
+        <!-- Case Details Rendered Here -->
+        <div class="drawer-body-text" id="viewer-content">
+          <!-- Text and markup will be injected here -->
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- JavaScript App Logic -->
+  <script type="module" src="js/api.js"></script>
+  <script type="module" src="js/app.js"></script>
+</body>
+</html>

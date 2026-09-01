@@ -1,0 +1,1837 @@
+"use client";
+
+import Swal from "sweetalert2";
+import { useState, useEffect } from "react";
+import { useSearchParams } from "next/navigation";
+import { fetchAPI } from "@/lib/api";
+import { Save, Loader2, Globe, Megaphone, MapPin, Phone, Mail, Clock, LayoutTemplate, Search, Trash2, CheckCircle2, Zap, Plus, BarChart3, Shield, FileText, HelpCircle, GripVertical, Upload, ImageIcon, Facebook, Youtube, Twitter, MessageCircle, ArrowUp, ArrowDown, Edit3, X } from "lucide-react";
+import { uploadFile } from "@/app/actions/upload";
+import { getStrapiMedia } from "@/lib/api";
+import { revalidateSiteConfig } from "@/app/actions/revalidate";
+
+/* ─── Theme Template Presets ──────────────────────────────────────────────── */
+type ThemeTemplate = {
+    id: string;
+    name: string;
+    style: string; // style tag shown on the card
+    desc: string;
+    colors: { primary: string; accent: string; surface?: string; text?: string };
+    preview: React.ReactNode;
+};
+
+// ── DataGOV Templates ──────────────────────────────────────────────────────
+const DATAGOV_TEMPLATES: ThemeTemplate[] = [
+    {
+        id: "datagov-excellence",
+        name: "Excellence Blue",
+        style: "Classic Government",
+        desc: "ธีมมาตรฐานราชการไทย แถบนำทางสีขาวบนพื้นเข้ม แถบข้อมูล 3 คอลัมน์",
+        colors: { primary: "#0c1222", accent: "#2563eb", surface: "#ffffff", text: "#1e293b" },
+        preview: (
+            <div className="h-36 relative overflow-hidden" style={{ background: "#f1f5f9" }}>
+                {/* Top Navbar - White with dark logo */}
+                <div className="absolute top-0 left-0 right-0 h-8 bg-white shadow-sm flex items-center px-3 gap-2">
+                    <div className="w-4 h-4 rounded bg-[#0c1222]" />
+                    <div className="w-12 h-2 rounded-full bg-[#0c1222]/30" />
+                    <div className="flex gap-2 ml-auto">
+                        {["นโยบาย", "ข่าว"].map(t => <div key={t} className="w-8 h-1.5 rounded-full bg-gray-300" />)}
+                        <div className="w-12 h-4 rounded-full bg-[#2563eb] flex items-center justify-center"><span className="text-[5px] text-white font-bold">ติดต่อ</span></div>
+                    </div>
+                </div>
+                {/* Hero - Dark Blue */}
+                <div className="absolute top-8 left-0 right-0" style={{ background: "#0c1222", height: 52 }}>
+                    <div className="px-3 pt-2">
+                        <div className="h-2 w-2/3 rounded-full bg-white/80 mb-1" />
+                        <div className="h-1.5 w-1/2 rounded-full bg-white/40" />
+                    </div>
+                    <div className="absolute right-3 top-2 w-14 h-8 rounded-lg opacity-20" style={{ background: "#2563eb" }} />
+                </div>
+                {/* Card Row */}
+                <div className="absolute bottom-2 left-2 right-2 flex gap-1.5">
+                    {[0, 1, 2].map(i => (
+                        <div key={i} className="flex-1 h-8 bg-white rounded-xl shadow-sm border border-gray-100 flex flex-col justify-center px-1.5">
+                            <div className="w-3 h-3 rounded mb-0.5" style={{ background: "#2563eb" }} />
+                            <div className="h-1 rounded-full bg-gray-200" />
+                        </div>
+                    ))}
+                </div>
+            </div>
+        ),
+    },
+    {
+        id: "datagov-slate",
+        name: "Night Slate",
+        style: "Dark Glassmorphism",
+        desc: "โหมดมืดสมัยใหม่ ใช้เอฟเฟกต์โปร่งแสง (Glass) สำหรับไซต์ระดับ Innovation",
+        colors: { primary: "#0f172a", accent: "#7c3aed", surface: "#1e293b", text: "#f1f5f9" },
+        preview: (
+            <div className="h-36 relative overflow-hidden" style={{ background: "#0f172a" }}>
+                {/* Purple orbs */}
+                <div className="absolute -top-6 -right-6 w-20 h-20 rounded-full blur-xl" style={{ background: "#7c3aed", opacity: 0.4 }} />
+                <div className="absolute -bottom-4 -left-4 w-14 h-14 rounded-full blur-xl" style={{ background: "#4c1d95", opacity: 0.5 }} />
+                {/* Frosted Navbar */}
+                <div className="absolute top-0 left-0 right-0 h-7 flex items-center px-3 gap-2" style={{ background: "rgba(255,255,255,0.05)", backdropFilter: "blur(8px)", borderBottom: "1px solid rgba(255,255,255,0.08)" }}>
+                    <div className="w-3 h-3 rounded-full" style={{ background: "#7c3aed" }} />
+                    <div className="w-10 h-1.5 rounded-full bg-white/20" />
+                    <div className="flex gap-1.5 ml-auto">
+                        {[1, 2, 3].map(i => <div key={i} className="w-6 h-1 rounded-full bg-white/15" />)}
+                    </div>
+                </div>
+                {/* Split hero */}
+                <div className="absolute top-7 left-0 right-0 bottom-10 flex">
+                    <div className="flex-1 flex flex-col justify-center px-3">
+                        <div className="h-2 w-3/4 rounded-full bg-white/70 mb-1" />
+                        <div className="h-1.5 w-1/2 rounded-full bg-white/30 mb-2" />
+                        <div className="h-5 w-16 rounded-full flex items-center justify-center text-[6px] font-bold text-white" style={{ background: "#7c3aed" }}>Explore →</div>
+                    </div>
+                    <div className="w-16 relative">
+                        <div className="absolute inset-2 rounded-xl" style={{ background: "rgba(124,58,237,0.2)", border: "1px solid rgba(124,58,237,0.3)" }} />
+                        <div className="absolute top-4 right-4 w-6 h-6 rounded-full" style={{ background: "rgba(124,58,237,0.5)" }} />
+                    </div>
+                </div>
+                {/* Glass cards */}
+                <div className="absolute bottom-1.5 left-2 right-2 flex gap-1">
+                    {[0, 1, 2, 3].map(i => (
+                        <div key={i} className="flex-1 h-7 rounded-lg" style={{ background: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.1)" }}>
+                            <div className="h-1 mx-1 mt-1.5 rounded-full" style={{ background: "rgba(124,58,237,0.6)" }} />
+                        </div>
+                    ))}
+                </div>
+            </div>
+        ),
+    },
+    {
+        id: "datagov-royal",
+        name: "Royal Indigo",
+        style: "Premium Editorial",
+        desc: "สไตล์นิตยสาร Layout แบบ Editorial สีทองบน Indigo เข้ม ดูองค์กรระดับสูง",
+        colors: { primary: "#1e1b4b", accent: "#f59e0b", surface: "#f8f7ff", text: "#1e1b4b" },
+        preview: (
+            <div className="h-36 relative overflow-hidden" style={{ background: "#f8f7ff" }}>
+                {/* Gold top accent stripe */}
+                <div className="absolute top-0 left-0 right-0 h-1.5" style={{ background: "linear-gradient(90deg, #f59e0b, #fbbf24)" }} />
+                {/* Dark Indigo Sidebar */}
+                <div className="absolute top-0 left-0 bottom-0 w-14" style={{ background: "#1e1b4b" }}>
+                    <div className="flex flex-col items-center pt-6 gap-2">
+                        <div className="w-6 h-6 rounded-full" style={{ background: "#f59e0b" }} />
+                        {[1, 2, 3, 4].map(i => <div key={i} className="w-8 h-1.5 rounded-full bg-white/20" />)}
+                    </div>
+                </div>
+                {/* Main content area */}
+                <div className="absolute top-4 left-16 right-2 bottom-2">
+                    <div className="h-2 w-3/4 rounded-full mb-1" style={{ background: "#1e1b4b", opacity: 0.8 }} />
+                    <div className="h-1.5 w-1/2 rounded-full bg-gray-300 mb-3" />
+                    <div className="grid grid-cols-2 gap-1.5">
+                        <div className="h-10 rounded-xl" style={{ background: "#1e1b4b" }}>
+                            <div className="h-1.5 mx-2 mt-2 rounded-full" style={{ background: "#f59e0b" }} />
+                        </div>
+                        <div className="h-10 rounded-xl bg-gray-100 border border-gray-200" />
+                    </div>
+                </div>
+            </div>
+        ),
+    },
+];
+
+// ── PDPA Templates ──────────────────────────────────────────────────────────
+const PDPA_TEMPLATES: ThemeTemplate[] = [
+    // 1. EMERALD GREEN — classic PDPA
+    {
+        id: "pdpa-trust",
+        name: "Trust Emerald",
+        style: "Classic PDPA Green",
+        desc: "ธีมมาตรฐาน PDPA สีเขียวน่าไว้วางใจ เน้น Trust Badge และ Gradient เข้มสง่า",
+        colors: { primary: "#064e3b", accent: "#10b981", surface: "#f0fdf4", text: "#064e3b" },
+        preview: (
+            <div className="h-36 relative overflow-hidden" style={{ background: "linear-gradient(135deg, #064e3b 0%, #065f46 60%, #047857 100%)" }}>
+                {/* Center badge */}
+                <div className="absolute inset-0 flex flex-col items-center justify-center">
+                    <div className="w-10 h-10 rounded-2xl mb-1.5 flex items-center justify-center" style={{ background: "rgba(255,255,255,0.15)" }}>
+                        <div className="w-5 h-6 rounded-t-full border-2 border-white/60" />
+                    </div>
+                    <div className="h-2 w-24 rounded-full bg-white/70 mb-1" />
+                    <div className="h-1.5 w-16 rounded-full bg-white/40" />
+                </div>
+                {/* Top tag */}
+                <div className="absolute top-2 left-2 right-2 flex justify-between">
+                    <div className="px-2 py-0.5 rounded-full text-[6px] font-bold text-white" style={{ background: "rgba(16,185,129,0.5)" }}>PDPA Compliant</div>
+                    <div className="w-12 h-4 rounded-full flex gap-1 items-center justify-center" style={{ background: "rgba(255,255,255,0.1)" }}>
+                        {[1, 2, 3].map(i => <div key={i} className="w-2 h-1 rounded-full bg-white/40" />)}
+                    </div>
+                </div>
+                {/* Bottom leaf strip */}
+                <div className="absolute bottom-0 left-0 right-0 h-8" style={{ background: "rgba(16,185,129,0.15)" }}>
+                    <div className="flex gap-1.5 px-2 pt-1.5">
+                        {["สิทธิ์", "ความยินยอม", "DPO"].map(t => (
+                            <div key={t} className="flex-1 h-4 rounded-full flex items-center justify-center" style={{ background: "rgba(16,185,129,0.3)" }}>
+                                <span className="text-[5px] text-white">{t}</span>
+                            </div>
+                        ))}
+                    </div>
+                </div>
+            </div>
+        ),
+    },
+    // 2. NAVY BLUE — corporate compliance & law
+    {
+        id: "pdpa-certified",
+        name: "Certified Blue",
+        style: "Corporate Compliance",
+        desc: "ธีมฟ้าเข้มแบบองค์กรสากล เน้นความน่าเชื่อถือด้านกฎหมาย Compliance ระดับสูง",
+        colors: { primary: "#1e3a5f", accent: "#3b82f6", surface: "#eff6ff", text: "#1e3a5f" },
+        preview: (
+            <div className="h-36 relative overflow-hidden" style={{ background: "#eff6ff" }}>
+                {/* White clean nav */}
+                <div className="absolute top-0 left-0 right-0 h-8 bg-white shadow-sm flex items-center px-3 gap-2">
+                    <div className="w-5 h-5 rounded-lg flex items-center justify-center" style={{ background: "#1e3a5f" }}>
+                        <div className="w-2.5 h-2.5 rounded-sm bg-white/80" />
+                    </div>
+                    <div className="w-14 h-2 rounded-full" style={{ background: "#1e3a5f", opacity: 0.2 }} />
+                    <div className="ml-auto flex gap-1.5">
+                        {["นโยบาย", "PDPA"].map(t => <div key={t} className="w-9 h-1.5 rounded-full bg-gray-200" />)}
+                        <div className="w-14 h-5 rounded-full flex items-center justify-center" style={{ background: "#3b82f6" }}>
+                            <span className="text-[5px] text-white font-bold">ขอใช้สิทธิ์</span>
+                        </div>
+                    </div>
+                </div>
+                {/* Blue hero banner */}
+                <div className="absolute top-8 left-0 right-0 h-14" style={{ background: "linear-gradient(135deg, #1e3a5f, #1d4ed8)" }}>
+                    <div className="px-3 pt-2.5">
+                        <div className="h-2 w-3/4 rounded-full bg-white/80 mb-1.5" />
+                        <div className="h-1.5 w-1/2 rounded-full bg-white/40" />
+                    </div>
+                    <div className="absolute right-2 top-2 w-10 h-10 rounded-full flex items-center justify-center" style={{ background: "rgba(59,130,246,0.4)", border: "2px dashed rgba(255,255,255,0.5)" }}>
+                        <span className="text-[9px] text-white font-black">✓</span>
+                    </div>
+                </div>
+                {/* Badge row */}
+                <div className="absolute bottom-1.5 left-2 right-2 flex gap-1.5">
+                    {[{ v: "PDPA", c: "#3b82f6" }, { v: "ISO", c: "#1e3a5f" }, { v: "DPO", c: "#3b82f6" }].map(s => (
+                        <div key={s.v} className="flex-1 h-7 rounded-xl flex items-center justify-center" style={{ background: s.c }}>
+                            <span className="text-[7px] text-white font-black">{s.v}</span>
+                        </div>
+                    ))}
+                </div>
+            </div>
+        ),
+    },
+
+    // 3. DARK VIOLET — high-security enterprise
+    {
+        id: "pdpa-secure",
+        name: "Secure Violet",
+        style: "High-Security Privacy",
+        desc: "ธีมดำ-ม่วง High-security แสดงถึงระบบความเป็นส่วนตัวระดับ Enterprise Grade",
+        colors: { primary: "#1a1a2e", accent: "#a855f7", surface: "#faf5ff", text: "#1a1a2e" },
+        preview: (
+            <div className="h-36 relative overflow-hidden" style={{ background: "#0f0f1a" }}>
+                {/* Violet aura */}
+                <div className="absolute top-0 right-0 w-28 h-28 rounded-full" style={{ background: "radial-gradient(circle, rgba(168,85,247,0.4), transparent 70%)", filter: "blur(10px)" }} />
+                <div className="absolute bottom-0 left-4 w-20 h-16 rounded-full" style={{ background: "radial-gradient(circle, rgba(168,85,247,0.2), transparent 70%)" }} />
+                {/* Nav */}
+                <div className="absolute top-0 left-0 right-0 h-6 flex items-center px-3 gap-2" style={{ background: "rgba(168,85,247,0.1)", borderBottom: "1px solid rgba(168,85,247,0.3)" }}>
+                    <div className="w-2 h-2 rounded-full" style={{ background: "#a855f7" }} />
+                    <div className="text-[6px] font-bold" style={{ color: "#a855f7" }}>PDPA Secure</div>
+                    <div className="ml-auto">
+                        <div className="w-14 h-4 rounded-full flex items-center justify-center text-[5px] font-bold" style={{ background: "#a855f7", color: "#fff" }}>
+                            🔒 Encrypted
+                        </div>
+                    </div>
+                </div>
+                {/* Lock hero */}
+                <div className="absolute top-8 left-3 right-3 bottom-9">
+                    <div className="h-2 w-3/4 rounded-full bg-white/70 mb-1.5" />
+                    <div className="h-1.5 w-1/2 rounded-full bg-white/30 mb-2" />
+                    <div className="h-4 w-20 rounded-full flex items-center justify-center text-[5px] font-bold" style={{ background: "rgba(168,85,247,0.8)", color: "#fff" }}>
+                        ปกป้องข้อมูลคุณ
+                    </div>
+                </div>
+                {/* Tech tags */}
+                <div className="absolute bottom-1.5 left-2 right-2 flex gap-1">
+                    {["AES-256", "Zero-Log", "GDPR"].map(v => (
+                        <div key={v} className="flex-1 h-6 rounded-lg flex items-center justify-center text-[5px] font-bold" style={{ background: "rgba(168,85,247,0.15)", border: "1px solid rgba(168,85,247,0.35)", color: "#c084fc" }}>
+                            {v}
+                        </div>
+                    ))}
+                </div>
+            </div>
+        ),
+    },
+];
+/* ─────────────────────────────────────────────────────────────────────────── */
+
+
+export default function AdminSiteConfigPage() {
+    const searchParams = useSearchParams();
+    const siteParam = searchParams.get("site") || "main";
+    const domain = siteParam === "pdpa" ? "pdpa.localhost" : "localhost";
+
+    const [loading, setLoading] = useState(true);
+    const [saving, setSaving] = useState(false);
+    const [savedToast, setSavedToast] = useState(false);
+    const [configId, setConfigId] = useState<string | null>(null);
+    const [logoPreview, setLogoPreview] = useState<string | null>(null);
+    const [logoUploading, setLogoUploading] = useState(false);
+    const [dragIndex, setDragIndex] = useState<number | null>(null);
+    const [editingBlockIndex, setEditingBlockIndex] = useState<number | null>(null);
+    const [editingBlockData, setEditingBlockData] = useState<any>(null);
+    const [showPreviewPane, setShowPreviewPane] = useState(false);
+
+    const isPDPA = siteParam === "pdpa";
+    const DEFAULT_SECTION_ORDER = isPDPA
+        ? ["hero", "principles", "timeline", "news", "documents", "dpo_contact", "newsletter"]
+        : ["hero", "policies", "activities", "downloads", "newsletter"];
+    const SECTION_LABELS: Record<string, { label: string; icon: string; desc: string }> = isPDPA
+        ? {
+            hero: { label: "Hero Banner", icon: "🛡️", desc: "แบนเนอร์หลักพร้อม Shield Cards" },
+            principles: { label: "หลักการปฏิบัติงาน", icon: "📋", desc: "หลักการ 3 ด้าน Data Security, Rights, Limitation" },
+            timeline: { label: "Roadmap/Timeline", icon: "📅", desc: "ลำดับเวลาการดำเนินงาน PDPA" },
+            news: { label: "ข่าวกิจกรรม PDPA", icon: "📰", desc: "กิจกรรมด้านการคุ้มครองข้อมูล" },
+            documents: { label: "เอกสาร PDPA", icon: "📄", desc: "ประกาศ นโยบาย แบบฟอร์ม" },
+            dpo_contact: { label: "ติดต่อ DPO", icon: "📞", desc: "CTA ติดต่อเจ้าหน้าที่คุ้มครองข้อมูล" },
+            newsletter: { label: "สมัครรับข่าวสาร", icon: "📧", desc: "ฟอร์มรับข่าวสาร PDPA" },
+        }
+        : {
+            hero: { label: "Hero Banner", icon: "🎬", desc: "สไลด์ภาพหลักและสถิติ" },
+            policies: { label: "นโยบาย/บริการ", icon: "📋", desc: "การ์ดนโยบายและบริการ" },
+            activities: { label: "ข่าวกิจกรรม", icon: "📰", desc: "รายการข่าวล่าสุด" },
+            downloads: { label: "เอกสารดาวน์โหลด", icon: "📥", desc: "เอกสารสำหรับดาวน์โหลด" },
+            newsletter: { label: "สมัครรับข่าวสาร", icon: "📧", desc: "ฟอร์มรับข่าวสาร" },
+        };
+
+    const [formData, setFormData] = useState({
+        siteName: "",
+        announcement: "",
+        notifications: [] as string[],
+        heroHeadline: "",
+        heroSubheadline: "",
+        heroStats: [] as { value: string; label: string; sublabel: string }[],
+        address: "",
+        phone: "",
+        email: "",
+        officeHours: "",
+        footerText: "",
+        themeColors: { primary: "#0c1222", accent: "#2563eb" },
+        navbarMenu: [] as any[],
+        footerMenu: [] as any[],
+        sectionToggles: { hero: true, policies: true, activities: true, downloads: true, news: true, documents: true } as Record<string, boolean>,
+        sectionOrder: DEFAULT_SECTION_ORDER as any[],
+        cookieConsent: {
+            enabled: true,
+            title: "เว็บไซต์นี้ใช้คุกกี้ (Cookies)",
+            description: "เราใช้คุกกี้เพื่อพัฒนาประสบการณ์การใช้งาน วิเคราะห์การเข้าชมเว็บไซต์ และนำเสนอเนื้อหาที่เกี่ยวข้อง สามารถเลือกการตั้งค่าคุกกี้ได้ตามความต้องการของคุณ",
+            acceptAllLabel: "ยอมรับทั้งหมด",
+            rejectLabel: "ปฏิเสธที่ไม่จำเป็น",
+            policyLink: "/cookie-policy"
+        },
+        legalPages: {
+            privacyPolicy: { title: "นโยบายความเป็นส่วนตัว", content: "" },
+            cookiePolicy: { title: "นโยบายคุกกี้", content: "" },
+            termsOfUse: { title: "ข้อตกลงการใช้งาน", content: "" }
+        },
+        notFoundPage: {
+            title: "ไม่พบหน้าที่คุณต้องการ",
+            description: "หน้าที่คุณกำลังมองหาอาจถูกย้ายหรือลบออกแล้ว",
+            buttonText: "กลับหน้าแรก"
+        },
+        dpoPhone: "",
+        dpoEmail: "",
+        socialLinks: { facebook: "", youtube: "", twitter: "", line: "" },
+        headerStyle: "style-1",
+        footerStyle: "style-1",
+        navbarMenuStyle: "pill",
+        fontFamily: "prompt"
+    });
+
+    useEffect(() => {
+        const fetchConfig = async () => {
+            try {
+                const res = await fetchAPI("/site-configs", {
+                    filters: { domain },
+                    populate: ["logoImage"]
+                });
+                if (res.data && res.data.length > 0) {
+                    const config = res.data[0];
+                    setConfigId(config.documentId);
+                    // Set logo preview if exists
+                    if (config.logoImage?.url) {
+                        setLogoPreview(getStrapiMedia(config.logoImage.url) || null);
+                    }
+                    setFormData({
+                        siteName: config.siteName || "",
+                        announcement: config.announcement || "",
+                        notifications: config.notifications || [],
+                        heroHeadline: config.heroHeadline || "",
+                        heroSubheadline: config.heroSubheadline || "",
+                        heroStats: config.heroStats || [],
+                        address: config.address || "",
+                        phone: config.phone || "",
+                        email: config.email || "",
+                        officeHours: config.officeHours || "",
+                        footerText: config.footerText || "",
+                        themeColors: config.themeColors || { primary: "#0c1222", accent: "#2563eb" },
+                        navbarMenu: config.navbarMenu || [],
+                        footerMenu: config.footerMenu || [],
+                        sectionToggles: config.sectionToggles || { hero: true, policies: true, activities: true, downloads: true, news: true, documents: true },
+                        sectionOrder: config.sectionOrder || DEFAULT_SECTION_ORDER,
+                        cookieConsent: config.cookieConsent || {
+                            enabled: true,
+                            title: "เว็บไซต์นี้ใช้คุกกี้ (Cookies)",
+                            description: "เราใช้คุกกี้เพื่อพัฒนาประสบการณ์การใช้งาน",
+                            acceptAllLabel: "ยอมรับทั้งหมด",
+                            rejectLabel: "ปฏิเสธที่ไม่จำเป็น",
+                            policyLink: "/cookie-policy"
+                        },
+                        legalPages: config.legalPages || {
+                            privacyPolicy: { title: "นโยบายความเป็นส่วนตัว", content: "" },
+                            cookiePolicy: { title: "นโยบายคุกกี้", content: "" },
+                            termsOfUse: { title: "ข้อตกลงการใช้งาน", content: "" }
+                        },
+                        notFoundPage: config.notFoundPage || {
+                            title: "ไม่พบหน้าที่คุณต้องการ",
+                            description: "หน้าที่คุณกำลังมองหาอาจถูกย้ายหรือลบออกแล้ว",
+                            buttonText: "กลับหน้าแรก"
+                        },
+                        dpoPhone: config.dpoPhone || "",
+                        dpoEmail: config.dpoEmail || "",
+                        socialLinks: config.socialLinks || { facebook: "", youtube: "", twitter: "", line: "" },
+                        headerStyle: config.headerStyle || "style-1",
+                        footerStyle: config.footerStyle || "style-1",
+                        navbarMenuStyle: config.navbarMenuStyle || "pill",
+                        fontFamily: config.fontFamily || "prompt"
+                    });
+                }
+            } catch (error) {
+                console.error("Error fetching config", error);
+            } finally {
+                setLoading(false);
+            }
+        };
+        fetchConfig();
+    }, [domain]);
+
+    // ── Live Preview Sync ────────────────────────────────────────────────────
+    useEffect(() => {
+        const iframe = document.getElementById("live-preview-iframe") as HTMLIFrameElement;
+        if (iframe && iframe.contentWindow && showPreviewPane) {
+            iframe.contentWindow.postMessage({
+                type: 'LIVE_PREVIEW_SYNC',
+                payload: {
+                    themeColors: formData.themeColors,
+                    fontFamily: formData.fontFamily
+                }
+            }, '*');
+        }
+    }, [formData.themeColors, formData.fontFamily, showPreviewPane]);
+
+    const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+        setFormData({ ...formData, [e.target.name]: e.target.value });
+    };
+
+    const handleColorChange = (name: string, value: string) => {
+        setFormData({
+            ...formData,
+            themeColors: { ...formData.themeColors, [name]: value }
+        });
+    };
+
+    const handleAddMenuItem = (type: 'navbarMenu' | 'footerMenu') => {
+        const newItem = { label: "เมนูใหม่", href: "/" };
+        setFormData({
+            ...formData,
+            [type]: [...formData[type], newItem]
+        });
+    };
+
+    const handleUpdateMenuItem = (type: 'navbarMenu' | 'footerMenu', index: number, field: string, value: string) => {
+        const updatedMenu = [...formData[type]];
+        updatedMenu[index] = { ...updatedMenu[index], [field]: value };
+        setFormData({ ...formData, [type]: updatedMenu });
+    };
+
+    /* ── Logo Upload ───────────────────────────────────────────────────────── */
+    const handleLogoUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0];
+        if (!file || !configId) return;
+        setLogoUploading(true);
+        try {
+            const fd = new FormData();
+            fd.append("files", file);
+            const uploaded = await uploadFile(fd);
+            if (uploaded?.[0]?.id) {
+                // Link to site-config
+                await fetchAPI(`/site-configs/${configId}`, {}, {
+                    method: "PUT",
+                    body: JSON.stringify({ data: { logoImage: uploaded[0].id } })
+                });
+                setLogoPreview(getStrapiMedia(uploaded[0].url) || URL.createObjectURL(file));
+                Swal.fire({ icon: "success", title: "อัปโหลดสำเร็จ!", text: "โลโก้ถูกเปลี่ยนแล้ว", timer: 2000 });
+            }
+        } catch (err) {
+            console.error(err);
+            Swal.fire({ icon: "error", title: "ข้อผิดพลาด", text: "อัปโหลดโลโก้ไม่สำเร็จ" });
+        } finally {
+            setLogoUploading(false);
+        }
+    };
+
+    /* ── Section Reorder helpers ────────────────────────────────────────────── */
+    const moveSection = (fromIdx: number, toIdx: number) => {
+        if (toIdx < 0 || toIdx >= formData.sectionOrder.length) return;
+        const arr = [...formData.sectionOrder];
+        const [moved] = arr.splice(fromIdx, 1);
+        arr.splice(toIdx, 0, moved);
+        setFormData({ ...formData, sectionOrder: arr });
+    };
+
+    const handleDragStart = (index: number) => setDragIndex(index);
+    const handleDragOver = (e: React.DragEvent, index: number) => {
+        e.preventDefault();
+        if (dragIndex === null || dragIndex === index) return;
+        moveSection(dragIndex, index);
+        setDragIndex(index);
+    };
+    const handleDragEnd = () => setDragIndex(null);
+
+    const handleRemoveMenuItem = (type: 'navbarMenu' | 'footerMenu', index: number) => {
+        setFormData({
+            ...formData,
+            [type]: formData[type].filter((_, i) => i !== index)
+        });
+    };
+
+    /* ── Custom Block Handling ──────────────────────────────────────────────── */
+    const handleAddCustomBlock = () => {
+        const newBlock = {
+            id: 'custom-' + Date.now(),
+            type: 'custom',
+            title: 'บล็อกหัวข้อใหม่',
+            content: '<p>พิมพ์เนื้อหาที่นี่...</p>',
+            bgColor: '#ffffff'
+        };
+        const newOrder = [...formData.sectionOrder, newBlock];
+        // Add toggle true for new custom block
+        const newToggles = { ...formData.sectionToggles, [newBlock.id]: true };
+        setFormData({ ...formData, sectionOrder: newOrder, sectionToggles: newToggles });
+        setEditingBlockIndex(newOrder.length - 1);
+        setEditingBlockData(newBlock);
+    };
+
+    const handleSaveCustomBlock = () => {
+        if (editingBlockIndex === null || !editingBlockData) return;
+        const newOrder = [...formData.sectionOrder];
+        newOrder[editingBlockIndex] = editingBlockData;
+        setFormData({ ...formData, sectionOrder: newOrder });
+        setEditingBlockIndex(null);
+        setEditingBlockData(null);
+    };
+
+    const handleDeleteCustomBlock = (index: number) => {
+        const item = formData.sectionOrder[index];
+        const key = typeof item === 'string' ? item : item.id;
+        const newOrder = formData.sectionOrder.filter((_, i) => i !== index);
+        const newToggles = { ...formData.sectionToggles };
+        delete newToggles[key];
+        setFormData({ ...formData, sectionOrder: newOrder, sectionToggles: newToggles });
+        if (editingBlockIndex === index) {
+            setEditingBlockIndex(null);
+            setEditingBlockData(null);
+        }
+    };
+
+    const handleSubmit = async (e: React.FormEvent) => {
+        e.preventDefault();
+        if (!configId) return;
+
+        setSaving(true);
+        try {
+            const payload = { ...formData };
+            if (payload.email === "") (payload as any).email = null;
+            if (payload.dpoEmail === "") (payload as any).dpoEmail = null;
+
+            await fetchAPI(`/site-configs/${configId}`, {}, {
+                method: "PUT",
+                body: JSON.stringify({ data: payload })
+            });
+
+            await revalidateSiteConfig();
+
+            // 1. Apply new colours immediately (optimistic update)
+            const { primary, accent } = formData.themeColors;
+            if (primary && accent) {
+                const hexToRGB = (hex: string) => {
+                    const h = hex.replace("#", "");
+                    return `${parseInt(h.slice(0, 2), 16)}, ${parseInt(h.slice(2, 4), 16)}, ${parseInt(h.slice(4, 6), 16)}`;
+                };
+                const lighten = (hex: string, a: number) => {
+                    const h = hex.replace("#", "");
+                    const mix = (c: string) => Math.round(parseInt(c, 16) + (255 - parseInt(c, 16)) * a).toString(16).padStart(2, "0");
+                    return `#${mix(h.slice(0, 2))}${mix(h.slice(2, 4))}${mix(h.slice(4, 6))}`;
+                };
+                const darken = (hex: string, a: number) => {
+                    const h = hex.replace("#", "");
+                    const mix = (c: string) => Math.round(parseInt(c, 16) * (1 - a)).toString(16).padStart(2, "0");
+                    return `#${mix(h.slice(0, 2))}${mix(h.slice(2, 4))}${mix(h.slice(4, 6))}`;
+                };
+                const aRGB = hexToRGB(accent);
+                const root = document.documentElement;
+                root.style.setProperty("--primary-color", primary);
+                root.style.setProperty("--accent-color", accent);
+                root.style.setProperty("--accent-dark", darken(accent, 0.2));
+                root.style.setProperty("--accent-light", lighten(accent, 0.3));
+                root.style.setProperty("--accent-subtle", `rgba(${aRGB}, 0.06)`);
+                root.style.setProperty("--accent-glow", `rgba(${aRGB}, 0.14)`);
+            }
+
+            if (formData.fontFamily) {
+                const getFontSet = (f: string) => {
+                    if (f === 'sarabun') return 'var(--font-sarabun), "Sarabun"';
+                    if (f === 'kanit') return 'var(--font-kanit), "Kanit"';
+                    if (f === 'notoSansThai') return 'var(--font-noto-sans-thai), "Noto Sans Thai"';
+                    return 'var(--font-prompt), "Prompt"';
+                };
+                const fontFam = getFontSet(formData.fontFamily);
+                document.documentElement.style.setProperty("--font-sans", `${fontFam}, ui-sans-serif, system-ui, sans-serif`);
+                document.documentElement.style.setProperty("--font-heading", `${fontFam}, ui-sans-serif, system-ui, sans-serif`);
+            }
+
+            // Notify any other same-origin tabs (e.g. open frontend tab) via custom event
+            window.dispatchEvent(new CustomEvent("theme-updated", {
+                detail: { primary: formData.themeColors.primary, accent: formData.themeColors.accent, fontFamily: formData.fontFamily }
+            }));
+
+            // 2. Show toast
+            setSavedToast(true);
+
+            // 3. Reload page after short delay so all components get the new theme
+            setTimeout(() => {
+                window.location.reload();
+            }, 1200);
+
+        } catch (error) {
+            console.error("Error saving config", error);
+            Swal.fire({ icon: "error", title: "แจ้งเตือน", text: "เกิดข้อผิดพลาดในการบันทึก" });
+        } finally {
+            setSaving(false);
+        }
+    };
+
+    if (loading) {
+        return <div className="flex items-center justify-center h-64"><Loader2 className="animate-spin text-primary" size={32} /></div>;
+    }
+
+    return (
+        <div className="max-w-4xl mx-auto pb-40">
+            {/* ── Save Toast ── */}
+            {savedToast && (
+                <div className="fixed bottom-28 left-1/2 -translate-x-1/2 z-50 animate-in fade-in slide-in-from-bottom-4 duration-300">
+                    <div
+                        className="flex items-center gap-3 px-6 py-4 rounded-2xl shadow-2xl text-white font-bold text-sm"
+                        style={{ background: "var(--primary-color)", boxShadow: "0 20px 40px -8px var(--accent-glow)" }}
+                    >
+                        <CheckCircle2 size={20} style={{ color: "var(--accent-color)" }} />
+                        <span>บันทึกสำเร็จ! กำลังโหลดธีมใหม่...</span>
+                        <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin ml-1" />
+                    </div>
+                </div>
+            )}
+
+            <div className="mb-8 font-sans">
+                <h1 className="text-3xl font-black font-heading text-primary mb-2">ตั้งค่าเว็บไซต์</h1>
+                <p className="text-gray-500">จัดการข้อมูลพื้นฐานและภาพลักษณ์ของเว็บไซต์ {siteParam === "pdpa" ? "PDPA Center" : "DataGOV"}</p>
+            </div>
+
+            <form onSubmit={handleSubmit} className="space-y-8">
+                {/* ════════════════════════════════════════════════════════════
+                    🖼️ LOGO UPLOAD
+                ════════════════════════════════════════════════════════════ */}
+                <div className="bg-white p-8 rounded-[2rem] border border-gray-100 shadow-sm">
+                    <div className="flex items-center gap-3 mb-6 pb-4 border-b border-gray-50">
+                        <div className="w-10 h-10 rounded-xl flex items-center justify-center" style={{ background: 'var(--accent-subtle)', color: 'var(--accent-color)' }}>
+                            <ImageIcon size={20} />
+                        </div>
+                        <div>
+                            <h3 className="text-lg font-bold text-gray-800">โลโก้เว็บไซต์</h3>
+                            <p className="text-xs text-gray-400 mt-0.5">แสดงที่ Navbar และ Footer (แนะนำ PNG/SVG พื้นหลังโปร่งใส)</p>
+                        </div>
+                    </div>
+                    <div className="flex items-center gap-8">
+                        {/* Preview */}
+                        <div className="w-32 h-32 rounded-2xl border-2 border-dashed border-gray-200 flex items-center justify-center overflow-hidden bg-gray-50 flex-shrink-0">
+                            {logoPreview ? (
+                                <img src={logoPreview} alt="Logo" className="w-full h-full object-contain p-2" />
+                            ) : (
+                                <div className="text-center">
+                                    <ImageIcon size={32} className="mx-auto text-gray-300 mb-1" />
+                                    <p className="text-[10px] text-gray-400">ยังไม่มีโลโก้</p>
+                                </div>
+                            )}
+                        </div>
+                        {/* Upload */}
+                        <div className="flex-1">
+                            <label className="inline-flex items-center gap-3 px-6 py-3 rounded-2xl font-bold text-sm cursor-pointer transition-all hover:shadow-md border-2 border-dashed hover:border-solid" style={{ borderColor: 'var(--accent-color)', color: 'var(--accent-color)' }}>
+                                {logoUploading ? <Loader2 size={18} className="animate-spin" /> : <Upload size={18} />}
+                                {logoUploading ? "กำลังอัปโหลด..." : "เปลี่ยนโลโก้"}
+                                <input type="file" accept="image/*" className="hidden" onChange={handleLogoUpload} disabled={logoUploading} />
+                            </label>
+                            <p className="text-[10px] text-gray-400 mt-2">รองรับ PNG, SVG, WebP ขนาดไม่เกิน 2 MB</p>
+                        </div>
+                    </div>
+                </div>
+
+                {/* ════════════════════════════════════════════════════════════
+                    🔀 SECTION ORDER (Drag & Drop)
+                ════════════════════════════════════════════════════════════ */}
+                <div className="bg-white p-8 rounded-[2rem] border border-gray-100 shadow-sm">
+                    <div className="flex items-center gap-3 mb-6 pb-4 border-b border-gray-50">
+                        <div className="w-10 h-10 rounded-xl flex items-center justify-center" style={{ background: 'var(--accent-subtle)', color: 'var(--accent-color)' }}>
+                            <LayoutTemplate size={20} />
+                        </div>
+                        <div>
+                            <h3 className="text-lg font-bold text-gray-800">จัดเรียงลำดับ Section หน้าแรก</h3>
+                            <p className="text-xs text-gray-400 mt-0.5">ลากเพื่อสลับลำดับ หรือใช้ปุ่มลูกศรขึ้น/ลง</p>
+                        </div>
+                    </div>
+                    <div className="space-y-2">
+                        {formData.sectionOrder.map((sectionItem, index) => {
+                            const isCustom = typeof sectionItem === "object";
+                            const sectionKey = isCustom ? sectionItem.id : sectionItem;
+                            const info = isCustom
+                                ? { label: sectionItem.title || "Custom Block", icon: "✏️", desc: "บล็อกเนื้อหาที่กำหนดเอง" }
+                                : SECTION_LABELS[sectionKey] || { label: sectionKey, icon: "📦", desc: "" };
+                            const isEnabled = formData.sectionToggles[sectionKey] !== false;
+                            return (
+                                <div
+                                    key={sectionKey}
+                                    draggable
+                                    onDragStart={() => handleDragStart(index)}
+                                    onDragOver={(e) => handleDragOver(e, index)}
+                                    onDragEnd={handleDragEnd}
+                                    className={`flex items-center gap-4 p-4 rounded-2xl border-2 transition-all cursor-grab active:cursor-grabbing ${dragIndex === index
+                                        ? 'border-accent bg-accent/5 shadow-lg scale-[1.02]'
+                                        : isEnabled
+                                            ? 'border-gray-100 bg-gray-50/50 hover:border-gray-200 hover:shadow-sm'
+                                            : 'border-gray-100 bg-gray-100/50 opacity-50'
+                                        }`}
+                                >
+                                    <GripVertical size={20} className="text-gray-300 flex-shrink-0" />
+                                    <span className="text-2xl flex-shrink-0">{info.icon}</span>
+                                    <div className="flex-1 min-w-0">
+                                        <p className="font-bold text-sm text-gray-800">{info.label}</p>
+                                        <p className="text-[10px] text-gray-400 truncate">{info.desc}</p>
+                                    </div>
+                                    {/* Action Buttons */}
+                                    {isCustom && (
+                                        <>
+                                            <button
+                                                type="button"
+                                                onClick={() => { setEditingBlockIndex(index); setEditingBlockData({ ...sectionItem }); }}
+                                                className="p-2 text-primary hover:bg-gray-100 rounded-lg transition-colors flex-shrink-0"
+                                            >
+                                                <Edit3 size={16} />
+                                            </button>
+                                            <button
+                                                type="button"
+                                                onClick={() => handleDeleteCustomBlock(index)}
+                                                className="p-2 text-rose-500 hover:bg-rose-50 rounded-lg transition-colors flex-shrink-0"
+                                            >
+                                                <Trash2 size={16} />
+                                            </button>
+                                        </>
+                                    )}
+                                    {/* Toggle */}
+                                    <button
+                                        type="button"
+                                        onClick={() => setFormData({
+                                            ...formData,
+                                            sectionToggles: { ...formData.sectionToggles, [sectionKey]: !isEnabled }
+                                        })}
+                                        className={`w-10 h-5 rounded-full transition-all relative flex-shrink-0 ${isEnabled ? 'bg-primary' : 'bg-gray-200'}`}
+                                    >
+                                        <div className={`absolute top-0.5 w-4 h-4 bg-white rounded-full transition-all shadow ${isEnabled ? 'right-0.5' : 'left-0.5'}`} />
+                                    </button>
+                                    {/* Up/Down */}
+                                    <div className="flex flex-col gap-0.5 flex-shrink-0">
+                                        <button type="button" onClick={() => moveSection(index, index - 1)} disabled={index === 0} className="p-1 rounded-lg hover:bg-gray-100 disabled:opacity-20 transition-all">
+                                            <ArrowUp size={14} className="text-gray-500" />
+                                        </button>
+                                        <button type="button" onClick={() => moveSection(index, index + 1)} disabled={index === formData.sectionOrder.length - 1} className="p-1 rounded-lg hover:bg-gray-100 disabled:opacity-20 transition-all">
+                                            <ArrowDown size={14} className="text-gray-500" />
+                                        </button>
+                                    </div>
+                                    <span className="w-7 h-7 rounded-full bg-gray-100 flex items-center justify-center text-[10px] font-black text-gray-400 flex-shrink-0">{index + 1}</span>
+                                </div>
+                            );
+                        })}
+                    </div>
+                    <div className="mt-6 flex items-center justify-between border-t border-gray-100 pt-6">
+                        <button
+                            type="button"
+                            onClick={() => setFormData({ ...formData, sectionOrder: DEFAULT_SECTION_ORDER })}
+                            className="text-xs font-bold text-gray-400 hover:text-accent transition-colors"
+                        >
+                            รีเซ็ตกลับค่าเริ่มต้น
+                        </button>
+                        <button
+                            type="button"
+                            onClick={handleAddCustomBlock}
+                            className="flex items-center gap-2 px-4 py-2 bg-accent/10 text-accent font-bold rounded-xl hover:bg-accent hover:text-white transition-all text-sm"
+                        >
+                            <Plus size={16} /> เพิ่มบล็อกเนื้อหาใหม่
+                        </button>
+                    </div>
+
+                    {/* Custom Block Modal */}
+                    {editingBlockIndex !== null && editingBlockData && (
+                        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
+                            <div className="bg-white rounded-3xl shadow-2xl w-full max-w-2xl overflow-hidden flex flex-col max-h-[90vh]">
+                                <div className="p-6 border-b border-gray-100 flex items-center justify-between flex-shrink-0">
+                                    <h3 className="text-xl font-bold text-gray-800">จัดการบล็อกเนื้อหา</h3>
+                                    <button
+                                        type="button"
+                                        onClick={() => { setEditingBlockIndex(null); setEditingBlockData(null); }}
+                                        className="p-2 text-gray-400 hover:text-gray-800 hover:bg-gray-100 rounded-lg transition-colors"
+                                    >
+                                        <X size={20} />
+                                    </button>
+                                </div>
+                                <div className="p-6 overflow-y-auto flex-1 space-y-6">
+                                    <div className="space-y-2">
+                                        <label className="text-sm font-bold text-gray-700">หัวข้อบล็อก (Title)</label>
+                                        <input
+                                            type="text"
+                                            value={editingBlockData.title}
+                                            onChange={(e) => setEditingBlockData({ ...editingBlockData, title: e.target.value })}
+                                            className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl font-bold"
+                                            placeholder="กรอกชื่อหัวข้อ"
+                                        />
+                                    </div>
+                                    <div className="space-y-2">
+                                        <label className="text-sm font-bold text-gray-700">สีพื้นหลัง (Background Color)</label>
+                                        <div className="flex items-center gap-4">
+                                            <input
+                                                type="color"
+                                                value={editingBlockData.bgColor}
+                                                onChange={(e) => setEditingBlockData({ ...editingBlockData, bgColor: e.target.value })}
+                                                className="w-12 h-12 rounded-xl cursor-pointer border border-gray-200"
+                                            />
+                                            <input
+                                                type="text"
+                                                value={editingBlockData.bgColor}
+                                                onChange={(e) => setEditingBlockData({ ...editingBlockData, bgColor: e.target.value })}
+                                                className="flex-1 px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl font-mono text-sm"
+                                            />
+                                        </div>
+                                    </div>
+                                    <div className="space-y-2">
+                                        <label className="text-sm font-bold text-gray-700">เนื้อหา (HTML Content)</label>
+                                        <textarea
+                                            value={editingBlockData.content}
+                                            onChange={(e) => setEditingBlockData({ ...editingBlockData, content: e.target.value })}
+                                            className="w-full h-40 px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl font-mono text-sm resize-y"
+                                            placeholder="<p>สามารถใส่ HTML ย่อหน้า, ลิงก์ ฯลฯ ได้ที่นี่</p>"
+                                        />
+                                        <p className="text-[10px] text-gray-400 mt-1">สามารถนำโค้ด HTML มาใส่ได้โดยตรง เช่น &lt;p&gt;, &lt;img&gt;, &lt;a&gt;</p>
+                                    </div>
+                                </div>
+                                <div className="p-6 border-t border-gray-100 flex justify-end gap-3 flex-shrink-0">
+                                    <button
+                                        type="button"
+                                        onClick={() => { setEditingBlockIndex(null); setEditingBlockData(null); }}
+                                        className="px-6 py-3 rounded-xl font-bold text-gray-500 hover:bg-gray-100 transition-colors"
+                                    >
+                                        ยกเลิก
+                                    </button>
+                                    <button
+                                        type="button"
+                                        onClick={handleSaveCustomBlock}
+                                        className="px-6 py-3 bg-primary text-white font-bold rounded-xl hover:bg-accent transition-colors shadow-lg shadow-primary/30 flex items-center gap-2"
+                                    >
+                                        <CheckCircle2 size={18} /> บันทึกบล็อก
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    )}
+                </div>
+
+                {/* ─────────────────────────────────────
+                    Header & Footer Styles
+                ───────────────────────────────────── */}
+                <div className="bg-white p-8 rounded-[2rem] border border-gray-100 shadow-sm">
+                    <div className="flex items-center gap-3 mb-6 pb-4 border-b border-gray-50">
+                        <div className="w-10 h-10 rounded-xl flex items-center justify-center" style={{ background: 'var(--accent-subtle)', color: 'var(--accent-color)' }}>
+                            <LayoutTemplate size={20} />
+                        </div>
+                        <div>
+                            <h3 className="text-lg font-bold text-gray-800">รูปแบบการแสดงผล (Header & Footer)</h3>
+                            <p className="text-xs text-gray-400 mt-0.5">เลือกรูปแบบของเมนูด้านบนและส่วนท้ายเว็บไซต์</p>
+                        </div>
+                    </div>
+
+                    <div className="space-y-8">
+                        {/* Header Styles */}
+                        <div>
+                            <h4 className="font-bold text-gray-700 mb-4">รูปแบบ Header (Navbar)</h4>
+                            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                                {['style-1', 'style-2', 'style-3'].map((style) => (
+                                    <button
+                                        key={`header-${style}`}
+                                        type="button"
+                                        onClick={() => setFormData({ ...formData, headerStyle: style })}
+                                        className={`p-4 rounded-2xl border-2 text-left transition-all ${formData.headerStyle === style ? 'border-primary bg-primary/5 ring-4 ring-primary/10' : 'border-gray-100 hover:border-gray-200'}`}
+                                    >
+                                        <div className="h-20 bg-gray-50 rounded-xl mb-3 flex items-center justify-center overflow-hidden border border-gray-200 p-2">
+                                            {/* Mockup visual based on style */}
+                                            {style === 'style-1' && <div className="w-full h-8 bg-white border border-gray-200 rounded flex items-center justify-between px-2 opacity-70"><div className="w-6 h-4 bg-gray-300 rounded" /><div className="flex gap-1"><div className="w-4 h-1 bg-gray-300 rounded" /><div className="w-4 h-1 bg-gray-300 rounded" /></div></div>}
+                                            {style === 'style-2' && <div className="w-full h-12 bg-white border border-gray-200 rounded flex flex-col items-center justify-center gap-1 opacity-70"><div className="w-6 h-4 bg-gray-300 rounded" /><div className="flex gap-1"><div className="w-4 h-1 bg-gray-200 rounded" /><div className="w-4 h-1 bg-gray-200 rounded" /></div></div>}
+                                            {style === 'style-3' && <div className="w-3/4 h-6 bg-white rounded-full shadow border flex items-center justify-between px-2 opacity-70 mt-2"><div className="w-4 h-3 bg-gray-300 rounded-full" /><div className="flex gap-1"><div className="w-3 h-1 bg-gray-200 rounded" /></div></div>}
+                                        </div>
+                                        <h5 className="font-bold text-sm text-gray-800 mb-1">
+                                            {style === 'style-1' ? 'Classic (ค่าเริ่มต้น)' : style === 'style-2' ? 'Centered Elegance' : 'Modern Floating'}
+                                        </h5>
+                                        <p className="text-[10px] text-gray-500">
+                                            {style === 'style-1' ? 'โลโก้ซ้าย เมนูขวา ดูเป็นทางการ' : style === 'style-2' ? 'โลโก้อยู่ตรงกลาง เมนูเรียงกัน' : 'เมนูแบบแคปซูลลอยตัว'}
+                                        </p>
+                                    </button>
+                                ))}
+                            </div>
+                        </div>
+
+                        {/* Menu Item Styles */}
+                        <div>
+                            <h4 className="font-bold text-gray-700 mb-4">รูปแบบรายการเมนู (Menu Items)</h4>
+                            <div className="flex flex-wrap gap-3">
+                                {[
+                                    { value: 'pill', label: 'Pill (แคปซูล)', desc: 'พื้นหลังทึบเมื่อชี้' },
+                                    { value: 'underline', label: 'Underline (ขีดเส้นใต้)', desc: 'เส้นใต้ยืดออก' },
+                                    { value: 'outline', label: 'Outline (ขอบเส้น)', desc: 'มีกรอบเส้นรอบเมนู' },
+                                    { value: 'glow', label: 'Glow (เรืองแสง)', desc: 'ข้อความเรืองแสง' },
+                                    { value: 'minimal', label: 'Minimal (มินิมอล)', desc: 'เปลี่ยนสีข้อความ' }
+                                ].map((style) => (
+                                    <button
+                                        key={style.value}
+                                        type="button"
+                                        onClick={() => setFormData({ ...formData, navbarMenuStyle: style.value })}
+                                        className={`px-5 py-3 rounded-xl border-2 text-left transition-all flex flex-col items-center justify-center min-w-[120px] ${formData.navbarMenuStyle === style.value ? 'border-primary bg-primary/5 ring-4 ring-primary/10' : 'border-gray-100 hover:border-gray-200'}`}
+                                    >
+                                        <h5 className={`font-bold text-sm mb-1 ${formData.navbarMenuStyle === style.value ? 'text-primary' : 'text-gray-700'}`}>
+                                            {style.label}
+                                        </h5>
+                                        <p className="text-[10px] text-gray-500 text-center">
+                                            {style.desc}
+                                        </p>
+                                    </button>
+                                ))}
+                            </div>
+                        </div>
+
+                        {/* Footer Styles */}
+                        <div>
+                            <h4 className="font-bold text-gray-700 mb-4">รูปแบบ Footer</h4>
+                            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                                {['style-1', 'style-2', 'style-3'].map((style) => (
+                                    <button
+                                        key={`footer-${style}`}
+                                        type="button"
+                                        onClick={() => setFormData({ ...formData, footerStyle: style })}
+                                        className={`p-4 rounded-2xl border-2 text-left transition-all ${formData.footerStyle === style ? 'border-primary bg-primary/5 ring-4 ring-primary/10' : 'border-gray-100 hover:border-gray-200'}`}
+                                    >
+                                        <div className="h-24 bg-gray-50 rounded-xl mb-3 flex items-center justify-center overflow-hidden border border-gray-200 p-2">
+                                            {/* Mockup visual based on style */}
+                                            {style === 'style-1' && <div className="w-full flex justify-between gap-4 opacity-70"><div className="w-1/2 h-16 bg-gray-300 rounded" /><div className="w-1/2 h-16 bg-gray-200 rounded" /></div>}
+                                            {style === 'style-2' && <div className="w-full flex flex-col items-center justify-center gap-2 opacity-70"><div className="w-8 h-8 bg-gray-300 rounded-full" /><div className="w-24 h-2 bg-gray-200 rounded" /></div>}
+                                            {style === 'style-3' && <div className="w-full flex gap-2 opacity-70"><div className="w-1/2 h-16 bg-gray-800 rounded" /><div className="w-1/2 h-16 bg-gray-200 rounded" /></div>}
+                                        </div>
+                                        <h5 className="font-bold text-sm text-gray-800 mb-1">
+                                            {style === 'style-1' ? 'Corporate (ค่าเริ่มต้น)' : style === 'style-2' ? 'Minimalist Centered' : 'Split / Magazine'}
+                                        </h5>
+                                        <p className="text-[10px] text-gray-500">
+                                            {style === 'style-1' ? 'แบ่งคอลัมน์ซ้ายขวา' : style === 'style-2' ? 'จัดกลางแบบมินิมอล' : 'แบ่งสองฝั่งชัดเจน เน้นแบบฟอร์ม'}
+                                        </p>
+                                    </button>
+                                ))}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {/* ─────────────────────────────────────
+                    Theme Template Picker
+                ───────────────────────────────────── */}
+                <div className="bg-white p-8 rounded-[2rem] border border-gray-100 shadow-sm">
+                    <div className="flex items-center gap-3 mb-6 pb-4 border-b border-gray-50">
+                        <div className="w-10 h-10 rounded-xl flex items-center justify-center" style={{ background: 'var(--accent-subtle)', color: 'var(--accent-color)' }}>
+                            <LayoutTemplate size={20} />
+                        </div>
+                        <div>
+                            <h3 className="text-lg font-bold text-gray-800">เทมเพลตธีม (Theme Templates)</h3>
+                            <p className="text-xs text-gray-400 mt-0.5">เลือกชุดสีสำเร็จรูปสำหรับเว็บไซต์ {siteParam === "pdpa" ? "PDPA Center" : "DataGOV"}</p>
+                        </div>
+                    </div>
+
+                    {/* Template Grid */}
+                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
+                        {(siteParam === "pdpa" ? PDPA_TEMPLATES : DATAGOV_TEMPLATES).map((tpl) => {
+                            const isActive =
+                                formData.themeColors.primary === tpl.colors.primary &&
+                                formData.themeColors.accent === tpl.colors.accent;
+                            return (
+                                <button
+                                    key={tpl.id}
+                                    type="button"
+                                    onClick={() =>
+                                        setFormData({ ...formData, themeColors: { primary: tpl.colors.primary, accent: tpl.colors.accent } })
+                                    }
+                                    className={`group relative text-left rounded-[1.75rem] border-2 overflow-hidden transition-all duration-300 hover:-translate-y-1 hover:shadow-2xl ${isActive
+                                        ? "border-violet-500 shadow-xl shadow-violet-200/50 ring-4 ring-violet-400/20"
+                                        : "border-transparent hover:border-gray-200 shadow-md"
+                                        }`}
+                                >
+                                    {/* Unique Layout Preview */}
+                                    <div className="rounded-t-[1.25rem] overflow-hidden">
+                                        {tpl.preview}
+                                    </div>
+
+                                    {/* Info footer */}
+                                    <div className="p-4 bg-white border-t border-gray-50">
+                                        <div className="flex items-start justify-between mb-1.5">
+                                            <div>
+                                                <p className="font-black text-sm text-gray-900">{tpl.name}</p>
+                                                <span className="text-[9px] font-bold uppercase tracking-wider" style={{ color: tpl.colors.accent }}>
+                                                    {tpl.style}
+                                                </span>
+                                            </div>
+                                            {isActive ? (
+                                                <span className="px-2 py-0.5 text-white text-[9px] font-black rounded-full whitespace-nowrap" style={{ background: 'var(--accent-color)' }}>✓ กำลังใช้</span>
+                                            ) : (
+                                                <span className="px-2 py-0.5 bg-gray-50 text-gray-400 text-[9px] font-bold rounded-full opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap">เลือก</span>
+                                            )}
+                                        </div>
+                                        <p className="text-[10px] text-gray-400 leading-relaxed mb-3">{tpl.desc}</p>
+                                        <div className="flex items-center gap-1.5">
+                                            <div className="flex -space-x-1">
+                                                <div className="w-5 h-5 rounded-full border-2 border-white shadow-sm" style={{ background: tpl.colors.primary }} />
+                                                <div className="w-5 h-5 rounded-full border-2 border-white shadow-sm" style={{ background: tpl.colors.accent }} />
+                                                {tpl.colors.surface && <div className="w-5 h-5 rounded-full border-2 border-gray-100 shadow-sm" style={{ background: tpl.colors.surface }} />}
+                                            </div>
+                                            <span className="text-[9px] text-gray-300 font-mono">{tpl.colors.primary} · {tpl.colors.accent}</span>
+                                        </div>
+                                    </div>
+                                </button>
+                            );
+                        })}
+                    </div>
+
+                    {/* Manual Override */}
+                    <div className="mt-6 pt-6 border-t border-gray-50">
+                        <p className="text-xs font-bold text-gray-500 mb-4 flex items-center gap-2">
+                            <span className="w-4 h-px bg-gray-300 inline-block" />
+                            หรือปรับสีเองแบบ Custom
+                            <span className="w-4 h-px bg-gray-300 inline-block" />
+                        </p>
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div className="space-y-3">
+                                <label className="text-sm font-bold text-gray-700 block">โทนสีหลัก (Primary)</label>
+                                <div className="flex items-center gap-4">
+                                    <input
+                                        type="color"
+                                        value={formData.themeColors.primary}
+                                        onChange={(e) => handleColorChange('primary', e.target.value)}
+                                        className="w-12 h-12 rounded-xl cursor-pointer border border-gray-200"
+                                    />
+                                    <input
+                                        type="text"
+                                        value={formData.themeColors.primary}
+                                        onChange={(e) => handleColorChange('primary', e.target.value)}
+                                        className="flex-1 px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl font-mono text-sm"
+                                    />
+                                </div>
+                            </div>
+                            <div className="space-y-3">
+                                <label className="text-sm font-bold text-gray-700 block">สีเน้น (Accent)</label>
+                                <div className="flex items-center gap-4">
+                                    <input
+                                        type="color"
+                                        value={formData.themeColors.accent}
+                                        onChange={(e) => handleColorChange('accent', e.target.value)}
+                                        className="w-12 h-12 rounded-xl cursor-pointer border border-gray-200"
+                                    />
+                                    <input
+                                        type="text"
+                                        value={formData.themeColors.accent}
+                                        onChange={(e) => handleColorChange('accent', e.target.value)}
+                                        className="flex-1 px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl font-mono text-sm"
+                                    />
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                {/* ─────────────────────────────────────
+                    Typography (Fonts)
+                ───────────────────────────────────── */}
+                <div className="bg-white p-8 rounded-[2rem] border border-gray-100 shadow-sm">
+                    <div className="flex items-center gap-3 mb-6 pb-4 border-b border-gray-50">
+                        <div className="w-10 h-10 rounded-xl flex items-center justify-center" style={{ background: 'var(--accent-subtle)', color: 'var(--accent-color)' }}>
+                            <span className="font-bold text-xl">Aa</span>
+                        </div>
+                        <div>
+                            <h3 className="text-lg font-bold text-gray-800">รูปแบบตัวอักษร (Typography)</h3>
+                            <p className="text-xs text-gray-400 mt-0.5">เลือกรูปแบบตัวอักษรหลักสำหรับหน้าเว็บไซต์</p>
+                        </div>
+                    </div>
+
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                        {[
+                            { id: 'prompt', name: 'Prompt', type: 'ไม่มีหัว (Modern Sans)', preview: 'สวัสดีชาวโลก' },
+                            { id: 'kanit', name: 'Kanit', type: 'ไม่มีหัว (Dynamic Sans)', preview: 'สวัสดีชาวโลก' },
+                            { id: 'notoSansThai', name: 'Noto Sans Thai', type: 'ไม่มีหัว (Standard Sans)', preview: 'สวัสดีชาวโลก' },
+                            { id: 'sarabun', name: 'Sarabun', type: 'มีหัว (Official Serif)', preview: 'สวัสดีชาวโลก' },
+                        ].map((font) => (
+                            <button
+                                key={font.id}
+                                type="button"
+                                onClick={() => setFormData({ ...formData, fontFamily: font.id })}
+                                className={`p-5 rounded-2xl border-2 text-left transition-all ${formData.fontFamily === font.id ? 'border-primary bg-primary/5 ring-4 ring-primary/10' : 'border-gray-100 hover:border-gray-200'}`}
+                            >
+                                <div className="text-2xl mb-2 text-gray-800" style={{ fontFamily: `var(--font-${font.id === 'notoSansThai' ? 'noto-sans-thai' : font.id})` }}>
+                                    {font.preview}
+                                </div>
+                                <h5 className="font-bold text-sm text-gray-800">{font.name}</h5>
+                                <p className="text-[10px] text-gray-500">{font.type}</p>
+                            </button>
+                        ))}
+                    </div>
+                </div>
+
+                {/* Navbar Menu Management */}
+                <div className="bg-white p-8 rounded-[2rem] border border-gray-100 shadow-sm">
+                    <div className="flex justify-between items-center mb-6 pb-4 border-b border-gray-50">
+                        <div className="flex items-center gap-3">
+                            <div className="w-10 h-10 rounded-xl flex items-center justify-center" style={{ background: 'var(--accent-subtle)', color: 'var(--accent-color)' }}>
+                                <Search size={20} />
+                            </div>
+                            <h3 className="text-lg font-bold text-gray-800">จัดการเมนูนำทาง (Navbar)</h3>
+                        </div>
+                        <button
+                            type="button"
+                            onClick={() => handleAddMenuItem('navbarMenu')}
+                            className="text-xs font-bold text-primary px-4 py-2 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors"
+                        >
+                            + เพิ่มเมนู
+                        </button>
+                    </div>
+
+                    <div className="space-y-3">
+                        {formData.navbarMenu.length === 0 && <p className="text-center py-8 text-gray-400 italic text-sm">ยังไม่มีเมนู (จะใช้ค่าเริ่มต้นจากระบบ)</p>}
+                        {formData.navbarMenu.map((item, index) => (
+                            <div key={index} className="flex gap-4 items-center bg-gray-50/50 p-4 rounded-2xl border border-gray-50 group">
+                                <div className="flex-1 grid grid-cols-2 gap-4">
+                                    <input
+                                        placeholder="ชื่อเมนู"
+                                        value={item.label}
+                                        onChange={(e) => handleUpdateMenuItem('navbarMenu', index, 'label', e.target.value)}
+                                        className="px-4 py-2 bg-white border border-gray-100 rounded-xl text-sm font-bold"
+                                    />
+                                    <input
+                                        placeholder="ลิงก์ (e.g. /news)"
+                                        value={item.href}
+                                        onChange={(e) => handleUpdateMenuItem('navbarMenu', index, 'href', e.target.value)}
+                                        className="px-4 py-2 bg-white border border-gray-100 rounded-xl text-sm"
+                                    />
+                                </div>
+                                <button
+                                    type="button"
+                                    onClick={() => handleRemoveMenuItem('navbarMenu', index)}
+                                    className="p-2 text-rose-500 opacity-0 group-hover:opacity-100 transition-opacity"
+                                >
+                                    <Trash2 size={18} />
+                                </button>
+                            </div>
+                        ))}
+                    </div>
+                </div>
+
+                {/* Footer Menu Management */}
+                <div className="bg-white p-8 rounded-[2rem] border border-gray-100 shadow-sm">
+                    <div className="flex justify-between items-center mb-6 pb-4 border-b border-gray-50">
+                        <div className="flex items-center gap-3">
+                            <div className="w-10 h-10 rounded-xl bg-pink-50 text-pink-600 flex items-center justify-center">
+                                <LayoutTemplate size={20} />
+                            </div>
+                            <h3 className="text-lg font-bold text-gray-800">จัดการเมนูท้ายเว็บ (Footer)</h3>
+                        </div>
+                        <button
+                            type="button"
+                            onClick={() => handleAddMenuItem('footerMenu')}
+                            className="text-xs font-bold text-primary px-4 py-2 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors"
+                        >
+                            + เพิ่มเมนู
+                        </button>
+                    </div>
+
+                    <div className="space-y-3">
+                        {formData.footerMenu.length === 0 && <p className="text-center py-8 text-gray-400 italic text-sm">ยังไม่มีเมนู (จะใช้ค่าเริ่มต้นจากระบบ)</p>}
+                        {formData.footerMenu.map((item, index) => (
+                            <div key={index} className="flex gap-4 items-center bg-gray-50/50 p-4 rounded-2xl border border-gray-50 group">
+                                <div className="flex-1 grid grid-cols-2 gap-4">
+                                    <input
+                                        placeholder="ชื่อเมนู"
+                                        value={item.label}
+                                        onChange={(e) => handleUpdateMenuItem('footerMenu', index, 'label', e.target.value)}
+                                        className="px-4 py-2 bg-white border border-gray-100 rounded-xl text-sm font-bold"
+                                    />
+                                    <input
+                                        placeholder="ลิงก์ (e.g. /pdpa)"
+                                        value={item.href}
+                                        onChange={(e) => handleUpdateMenuItem('footerMenu', index, 'href', e.target.value)}
+                                        className="px-4 py-2 bg-white border border-gray-100 rounded-xl text-sm"
+                                    />
+                                </div>
+                                <button
+                                    type="button"
+                                    onClick={() => handleRemoveMenuItem('footerMenu', index)}
+                                    className="p-2 text-rose-500 opacity-0 group-hover:opacity-100 transition-opacity"
+                                >
+                                    <Trash2 size={18} />
+                                </button>
+                            </div>
+                        ))}
+                    </div>
+                </div>
+
+                {/* General Info */}
+                <div className="bg-white p-8 rounded-[2rem] border border-gray-100 shadow-sm">
+                    <div className="flex items-center gap-3 mb-6 pb-4 border-b border-gray-50">
+                        <div className="w-10 h-10 rounded-xl flex items-center justify-center" style={{ background: 'var(--accent-subtle)', color: 'var(--accent-color)' }}>
+                            <Globe size={20} />
+                        </div>
+                        <h3 className="text-lg font-bold text-gray-800">ข้อมูลทั่วไป</h3>
+                    </div>
+
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div className="space-y-2">
+                            <label className="text-sm font-bold text-gray-700">ชื่อเว็บไซต์</label>
+                            <input
+                                name="siteName"
+                                value={formData.siteName}
+                                onChange={handleChange}
+                                className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all font-medium"
+                                placeholder="ชื่อเว็บไซต์..."
+                            />
+                        </div>
+                        <div className="space-y-2">
+                            <label className="text-sm font-bold text-gray-700">ข้อความ Footer</label>
+                            <input
+                                name="footerText"
+                                value={formData.footerText}
+                                onChange={handleChange}
+                                className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all font-medium"
+                                placeholder="Copyright..."
+                            />
+                        </div>
+                        <div className="col-span-1 md:col-span-2 space-y-2">
+                            <div className="flex items-center gap-2 mb-1">
+                                <Megaphone size={14} className="text-accent" />
+                                <label className="text-sm font-bold text-gray-700">ประกาศตัววิ่ง (Announcement)</label>
+                            </div>
+                            <input
+                                name="announcement"
+                                value={formData.announcement}
+                                onChange={handleChange}
+                                className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all font-medium"
+                                placeholder="ประกาศสำคัญ..."
+                            />
+                        </div>
+                    </div>
+                </div>
+
+                {/* News Ticker Notifications ──────────────────────────── */}
+                <div className="bg-white p-8 rounded-[2rem] border border-gray-100 shadow-sm">
+                    <div className="flex items-center gap-3 mb-6 pb-4 border-b border-gray-50">
+                        <div className="w-10 h-10 rounded-xl flex items-center justify-center" style={{ background: 'var(--accent-subtle)', color: 'var(--accent-color)' }}>
+                            <Zap size={20} />
+                        </div>
+                        <div>
+                            <h3 className="text-lg font-bold text-gray-800">ข้อความ News Ticker (Live Updates)</h3>
+                            <p className="text-xs text-gray-400 mt-0.5">ข้อความที่เลื่อนบนแถบด้านบนสุดของเว็บไซต์ หากไม่มีจะใช้ announcements แทน</p>
+                        </div>
+                    </div>
+                    <div className="space-y-3">
+                        {formData.notifications.map((notif, idx) => (
+                            <div key={idx} className="flex gap-2 items-center">
+                                <span className="w-6 h-6 flex-shrink-0 rounded-full text-[10px] font-black flex items-center justify-center" style={{ background: 'var(--accent-subtle)', color: 'var(--accent-color)' }}>{idx + 1}</span>
+                                <input
+                                    value={notif}
+                                    onChange={(e) => {
+                                        const arr = [...formData.notifications];
+                                        arr[idx] = e.target.value;
+                                        setFormData({ ...formData, notifications: arr });
+                                    }}
+                                    className="flex-1 px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl text-sm font-medium outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all"
+                                    placeholder={`ข้อความที่ ${idx + 1}...`}
+                                />
+                                <button
+                                    type="button"
+                                    onClick={() => setFormData({ ...formData, notifications: formData.notifications.filter((_, i) => i !== idx) })}
+                                    className="p-2 text-rose-400 hover:text-rose-600 hover:bg-rose-50 rounded-lg transition-all"
+                                >
+                                    <Trash2 size={16} />
+                                </button>
+                            </div>
+                        ))}
+                        <button
+                            type="button"
+                            onClick={() => setFormData({ ...formData, notifications: [...formData.notifications, ""] })}
+                            className="mt-2 flex items-center gap-2 px-5 py-3 rounded-2xl font-bold text-sm border-2 border-dashed transition-all hover:opacity-80"
+                            style={{ borderColor: 'var(--accent-color)', color: 'var(--accent-color)' }}
+                        >
+                            <Plus size={16} /> เพิ่มข้อความใหม่
+                        </button>
+                    </div>
+                </div>
+
+                <div className="bg-white p-8 rounded-[2rem] border border-gray-100 shadow-sm">
+                    <div className="flex items-center gap-3 mb-6 pb-4 border-b border-gray-50">
+                        <div className="w-10 h-10 rounded-xl flex items-center justify-center" style={{ background: 'var(--accent-subtle)', color: 'var(--primary-color)' }}>
+                            <LayoutTemplate size={20} />
+                        </div>
+                        <h3 className="text-lg font-bold text-gray-800">ส่วนหัวของหน้าแรก (Hero Banner)</h3>
+                    </div>
+
+                    <div className="space-y-6">
+                        <div className="space-y-2">
+                            <label className="text-sm font-bold text-gray-700">หัวข้อหลัก (Headline)</label>
+                            <textarea
+                                name="heroHeadline"
+                                value={formData.heroHeadline}
+                                onChange={handleChange}
+                                rows={3}
+                                className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all font-heading font-bold text-lg"
+                                placeholder="ข้อความหัวข้อหลัก..."
+                            />
+                            <p className="text-[10px] text-gray-400">รองรับการขึ้นบรรทัดใหม่</p>
+                        </div>
+                        <div className="space-y-2">
+                            <label className="text-sm font-bold text-gray-700">คำโปรยรอง (Subheadline)</label>
+                            <textarea
+                                name="heroSubheadline"
+                                value={formData.heroSubheadline}
+                                onChange={handleChange}
+                                rows={3}
+                                className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all font-medium text-gray-500"
+                                placeholder="ข้อความอธิบายเพิ่มเติม..."
+                            />
+                        </div>
+                    </div>
+                </div>
+
+                {/* Hero Stats ──────────────────────────────────────────── */}
+                <div className="bg-white p-8 rounded-[2rem] border border-gray-100 shadow-sm">
+                    <div className="flex items-center gap-3 mb-6 pb-4 border-b border-gray-50">
+                        <div className="w-10 h-10 rounded-xl flex items-center justify-center" style={{ background: 'var(--accent-subtle)', color: 'var(--accent-color)' }}>
+                            <BarChart3 size={20} />
+                        </div>
+                        <div>
+                            <h3 className="text-lg font-bold text-gray-800">สถิติในส่วน Hero (Hero Stats)</h3>
+                            <p className="text-xs text-gray-400 mt-0.5">ตัวเลขสถิติที่แสดงในส่วน Hero Banner มีได้สูงสุด 3 รายการ</p>
+                        </div>
+                    </div>
+                    <div className="space-y-4">
+                        {formData.heroStats.map((stat, idx) => (
+                            <div key={idx} className="flex gap-3 items-start p-4 bg-gray-50 rounded-2xl">
+                                <span className="w-6 h-6 flex-shrink-0 rounded-full text-[10px] font-black flex items-center justify-center mt-3" style={{ background: 'var(--accent-subtle)', color: 'var(--accent-color)' }}>{idx + 1}</span>
+                                <div className="flex-1 grid grid-cols-3 gap-3">
+                                    <div className="space-y-1">
+                                        <label className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">ตัวเลข (Value)</label>
+                                        <input
+                                            value={stat.value}
+                                            onChange={(e) => {
+                                                const arr = [...formData.heroStats];
+                                                arr[idx] = { ...arr[idx], value: e.target.value };
+                                                setFormData({ ...formData, heroStats: arr });
+                                            }}
+                                            className="w-full px-3 py-2 bg-white border border-gray-200 rounded-xl text-sm font-bold outline-none focus:ring-2 focus:ring-primary/20"
+                                            placeholder="เช่น 1,200+"
+                                        />
+                                    </div>
+                                    <div className="space-y-1">
+                                        <label className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">ชื่อสถิติ (Label)</label>
+                                        <input
+                                            value={stat.label}
+                                            onChange={(e) => {
+                                                const arr = [...formData.heroStats];
+                                                arr[idx] = { ...arr[idx], label: e.target.value };
+                                                setFormData({ ...formData, heroStats: arr });
+                                            }}
+                                            className="w-full px-3 py-2 bg-white border border-gray-200 rounded-xl text-sm font-medium outline-none focus:ring-2 focus:ring-primary/20"
+                                            placeholder="เช่น ชุดข้อมูล"
+                                        />
+                                    </div>
+                                    <div className="space-y-1">
+                                        <label className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">คำอธิบาย (Sublabel)</label>
+                                        <input
+                                            value={stat.sublabel}
+                                            onChange={(e) => {
+                                                const arr = [...formData.heroStats];
+                                                arr[idx] = { ...arr[idx], sublabel: e.target.value };
+                                                setFormData({ ...formData, heroStats: arr });
+                                            }}
+                                            className="w-full px-3 py-2 bg-white border border-gray-200 rounded-xl text-sm font-medium outline-none focus:ring-2 focus:ring-primary/20"
+                                            placeholder="เช่น Open Data"
+                                        />
+                                    </div>
+                                </div>
+                                <button
+                                    type="button"
+                                    onClick={() => setFormData({ ...formData, heroStats: formData.heroStats.filter((_, i) => i !== idx) })}
+                                    className="p-2 text-rose-400 hover:text-rose-600 hover:bg-rose-50 rounded-lg transition-all mt-6"
+                                >
+                                    <Trash2 size={16} />
+                                </button>
+                            </div>
+                        ))}
+                        {formData.heroStats.length < 3 && (
+                            <button
+                                type="button"
+                                onClick={() => setFormData({ ...formData, heroStats: [...formData.heroStats, { value: "", label: "", sublabel: "" }] })}
+                                className="mt-2 flex items-center gap-2 px-5 py-3 rounded-2xl font-bold text-sm border-2 border-dashed transition-all hover:opacity-80"
+                                style={{ borderColor: 'var(--accent-color)', color: 'var(--accent-color)' }}
+                            >
+                                <Plus size={16} /> เพิ่มสถิติ (สูงสุด 3)
+                            </button>
+                        )}
+                    </div>
+                </div>
+
+                {/* Contact Info */}
+                <div className="bg-white p-8 rounded-[2rem] border border-gray-100 shadow-sm">
+                    <div className="flex items-center gap-3 mb-6 pb-4 border-b border-gray-50">
+                        <div className="w-10 h-10 rounded-xl flex items-center justify-center" style={{ background: 'var(--accent-subtle)', color: 'var(--accent-color)' }}>
+                            <MapPin size={20} />
+                        </div>
+                        <h3 className="text-lg font-bold text-gray-800">ข้อมูลติดต่อ</h3>
+                    </div>
+
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div className="col-span-1 md:col-span-2 space-y-2">
+                            <label className="text-sm font-bold text-gray-700">ที่อยู่ติดต่อ</label>
+                            <textarea
+                                name="address"
+                                value={formData.address}
+                                onChange={handleChange}
+                                rows={3}
+                                className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all font-medium"
+                                placeholder="ที่อยู่..."
+                            />
+                        </div>
+                        <div className="space-y-2">
+                            <div className="flex items-center gap-2 mb-1">
+                                <Phone size={14} className="text-gray-400" />
+                                <label className="text-sm font-bold text-gray-700">เบอร์โทรศัพท์</label>
+                            </div>
+                            <input
+                                name="phone"
+                                value={formData.phone}
+                                onChange={handleChange}
+                                className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all font-medium"
+                                placeholder="0 2xxx xxxx"
+                            />
+                        </div>
+                        <div className="space-y-2">
+                            <div className="flex items-center gap-2 mb-1">
+                                <Mail size={14} className="text-gray-400" />
+                                <label className="text-sm font-bold text-gray-700">อีเมล</label>
+                            </div>
+                            <input
+                                name="email"
+                                value={formData.email}
+                                onChange={handleChange}
+                                className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all font-medium"
+                                placeholder="email@example.com"
+                            />
+                        </div>
+                        <div className="col-span-1 md:col-span-2 space-y-2">
+                            <div className="flex items-center gap-2 mb-1">
+                                <Clock size={14} className="text-gray-400" />
+                                <label className="text-sm font-bold text-gray-700">เวลาทำการ</label>
+                            </div>
+                            <textarea
+                                name="officeHours"
+                                value={formData.officeHours}
+                                onChange={handleChange}
+                                rows={2}
+                                className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all font-medium"
+                                placeholder="วันจันทร์ - ศุกร์..."
+                            />
+                        </div>
+                        {/* DPO Contact */}
+                        <div className="col-span-1 md:col-span-2 border-t border-gray-50 pt-6 mt-2">
+                            <p className="text-xs font-black uppercase tracking-widest text-gray-400 mb-4">ข้อมูลเจ้าหน้าที่คุ้มครองข้อมูล (DPO)</p>
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                <div className="space-y-2">
+                                    <div className="flex items-center gap-2 mb-1">
+                                        <Phone size={14} className="text-gray-400" />
+                                        <label className="text-sm font-bold text-gray-700">เบอร์โทร DPO</label>
+                                    </div>
+                                    <input
+                                        name="dpoPhone"
+                                        value={(formData as any).dpoPhone || ""}
+                                        onChange={handleChange}
+                                        className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all font-medium"
+                                        placeholder="02-141-XXXX"
+                                    />
+                                </div>
+                                <div className="space-y-2">
+                                    <div className="flex items-center gap-2 mb-1">
+                                        <Mail size={14} className="text-gray-400" />
+                                        <label className="text-sm font-bold text-gray-700">อีเมล DPO</label>
+                                    </div>
+                                    <input
+                                        name="dpoEmail"
+                                        type="email"
+                                        value={(formData as any).dpoEmail || ""}
+                                        onChange={handleChange}
+                                        className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all font-medium"
+                                        placeholder="dpo@admincourt.go.th"
+                                    />
+                                </div>
+                            </div>
+                        </div>
+                        {/* Social Links — Enhanced with icons */}
+                        <div className="col-span-1 md:col-span-2 border-t border-gray-50 pt-6">
+                            <p className="text-xs font-black uppercase tracking-widest text-gray-400 mb-4">🌐 Social Media Links</p>
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                {[
+                                    { key: "facebook", icon: <Facebook size={16} />, color: "#1877F2", placeholder: "https://facebook.com/yourpage" },
+                                    { key: "youtube", icon: <Youtube size={16} />, color: "#FF0000", placeholder: "https://youtube.com/@yourchannel" },
+                                    { key: "twitter", icon: <Twitter size={16} />, color: "#1DA1F2", placeholder: "https://x.com/yourhandle" },
+                                    { key: "line", icon: <MessageCircle size={16} />, color: "#06C755", placeholder: "https://line.me/R/ti/p/yourid" },
+                                ].map((platform) => (
+                                    <div key={platform.key} className="space-y-2">
+                                        <label className="text-sm font-bold text-gray-700 flex items-center gap-2">
+                                            <span className="w-6 h-6 rounded-lg flex items-center justify-center text-white" style={{ background: platform.color }}>{platform.icon}</span>
+                                            {platform.key.charAt(0).toUpperCase() + platform.key.slice(1)}
+                                        </label>
+                                        <input
+                                            type="url"
+                                            value={(formData as any).socialLinks?.[platform.key] || ""}
+                                            onChange={(e) => setFormData({
+                                                ...formData,
+                                                socialLinks: { ...(formData as any).socialLinks, [platform.key]: e.target.value }
+                                            } as any)}
+                                            className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all font-medium text-sm"
+                                            placeholder={platform.placeholder}
+                                        />
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                {/* Cookie Consent Banner ─────────────────────────────── */}
+                <div className="bg-white p-8 rounded-[2rem] border border-gray-100 shadow-sm">
+                    <div className="flex items-center gap-3 mb-6 pb-4 border-b border-gray-50">
+                        <div className="w-10 h-10 rounded-xl flex items-center justify-center" style={{ background: 'var(--accent-subtle)', color: 'var(--accent-color)' }}>
+                            <Shield size={20} />
+                        </div>
+                        <div className="flex-1">
+                            <h3 className="text-lg font-bold text-gray-800">Cookie Consent Banner</h3>
+                            <p className="text-xs text-gray-400 mt-0.5">ข้อความแจ้งการใช้คุกกี้ตามกฎหมาย PDPA</p>
+                        </div>
+                        {/* Toggle */}
+                        <label className="flex items-center gap-3 cursor-pointer">
+                            <span className="text-sm font-bold text-gray-600">เปิดใช้งาน</span>
+                            <button
+                                type="button"
+                                onClick={() => setFormData({ ...formData, cookieConsent: { ...formData.cookieConsent, enabled: !formData.cookieConsent.enabled } })}
+                                className={`relative w-12 h-6 rounded-full transition-all ${formData.cookieConsent.enabled ? 'bg-primary' : 'bg-gray-300'}`}
+                            >
+                                <span className={`absolute top-1 w-4 h-4 bg-white rounded-full shadow transition-all ${formData.cookieConsent.enabled ? 'left-7' : 'left-1'}`} />
+                            </button>
+                        </label>
+                    </div>
+
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div className="space-y-2">
+                            <label className="text-sm font-bold text-gray-700">หัวข้อ Banner (Title)</label>
+                            <input
+                                value={formData.cookieConsent.title}
+                                onChange={(e) => setFormData({ ...formData, cookieConsent: { ...formData.cookieConsent, title: e.target.value } })}
+                                className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-primary/20 outline-none font-medium"
+                                placeholder="เว็บไซต์นี้ใช้คุกกี้..."
+                            />
+                        </div>
+                        <div className="space-y-2">
+                            <label className="text-sm font-bold text-gray-700">ลิงก์ Cookie Policy</label>
+                            <input
+                                value={formData.cookieConsent.policyLink}
+                                onChange={(e) => setFormData({ ...formData, cookieConsent: { ...formData.cookieConsent, policyLink: e.target.value } })}
+                                className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-primary/20 outline-none font-medium"
+                                placeholder="/cookie-policy"
+                            />
+                        </div>
+                        <div className="col-span-1 md:col-span-2 space-y-2">
+                            <label className="text-sm font-bold text-gray-700">รายละเอียดคุกกี้ (Description)</label>
+                            <textarea
+                                rows={3}
+                                value={formData.cookieConsent.description}
+                                onChange={(e) => setFormData({ ...formData, cookieConsent: { ...formData.cookieConsent, description: e.target.value } })}
+                                className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-primary/20 outline-none font-medium resize-none"
+                                placeholder="เราใช้คุกกี้เพื่อ..."
+                            />
+                        </div>
+                        <div className="space-y-2">
+                            <label className="text-sm font-bold text-gray-700">ปุ่ม "ยอมรับ" (Accept Label)</label>
+                            <input
+                                value={formData.cookieConsent.acceptAllLabel}
+                                onChange={(e) => setFormData({ ...formData, cookieConsent: { ...formData.cookieConsent, acceptAllLabel: e.target.value } })}
+                                className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-primary/20 outline-none font-medium"
+                                placeholder="ยอมรับทั้งหมด"
+                            />
+                        </div>
+                        <div className="space-y-2">
+                            <label className="text-sm font-bold text-gray-700">ปุ่ม "ปฏิเสธ" (Reject Label)</label>
+                            <input
+                                value={formData.cookieConsent.rejectLabel}
+                                onChange={(e) => setFormData({ ...formData, cookieConsent: { ...formData.cookieConsent, rejectLabel: e.target.value } })}
+                                className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-primary/20 outline-none font-medium"
+                                placeholder="ปฏิเสธที่ไม่จำเป็น"
+                            />
+                        </div>
+                    </div>
+                </div>
+
+                {/* Legal Pages ──────────────────────────────────────────── */}
+                <div className="bg-white p-8 rounded-[2rem] border border-gray-100 shadow-sm">
+                    <div className="flex items-center gap-3 mb-6 pb-4 border-b border-gray-50">
+                        <div className="w-10 h-10 rounded-xl flex items-center justify-center" style={{ background: 'var(--accent-subtle)', color: 'var(--primary-color)' }}>
+                            <FileText size={20} />
+                        </div>
+                        <div>
+                            <h3 className="text-lg font-bold text-gray-800">หน้าข้อมูลกฎหมาย</h3>
+                            <p className="text-xs text-gray-400 mt-0.5">แสดงที่ /privacy-policy, /cookie-policy, /terms-of-use</p>
+                        </div>
+                    </div>
+
+                    {/* Privacy Policy */}
+                    <div className="space-y-4 mb-6 pb-6 border-b border-gray-50">
+                        <h4 className="font-bold text-gray-700 flex items-center gap-2">
+                            <span className="w-5 h-5 rounded-full text-[9px] font-black flex items-center justify-center text-white" style={{ background: 'var(--primary-color)' }}>1</span>
+                            นโยบายความเป็นส่วนตัว (Privacy Policy)
+                        </h4>
+                        <div className="space-y-2">
+                            <label className="text-xs font-bold text-gray-500 uppercase tracking-widest">หัวข้อหน้า</label>
+                            <input
+                                value={formData.legalPages.privacyPolicy.title}
+                                onChange={(e) => setFormData({ ...formData, legalPages: { ...formData.legalPages, privacyPolicy: { ...formData.legalPages.privacyPolicy, title: e.target.value } } })}
+                                className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-primary/20 outline-none font-medium"
+                            />
+                        </div>
+                        <div className="space-y-2">
+                            <label className="text-xs font-bold text-gray-500 uppercase tracking-widest">เนื้อหา (รองรับ HTML)</label>
+                            <textarea
+                                rows={8}
+                                value={formData.legalPages.privacyPolicy.content}
+                                onChange={(e) => setFormData({ ...formData, legalPages: { ...formData.legalPages, privacyPolicy: { ...formData.legalPages.privacyPolicy, content: e.target.value } } })}
+                                className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-primary/20 outline-none font-mono text-sm resize-y"
+                                placeholder="<h2>1. การเก็บรวบรวมข้อมูล</h2><p>...</p>"
+                            />
+                        </div>
+                    </div>
+
+                    {/* Cookie Policy */}
+                    <div className="space-y-4 mb-6 pb-6 border-b border-gray-50">
+                        <h4 className="font-bold text-gray-700 flex items-center gap-2">
+                            <span className="w-5 h-5 rounded-full text-[9px] font-black flex items-center justify-center text-white" style={{ background: 'var(--primary-color)' }}>2</span>
+                            นโยบายคุกกี้ (Cookie Policy)
+                        </h4>
+                        <div className="space-y-2">
+                            <label className="text-xs font-bold text-gray-500 uppercase tracking-widest">หัวข้อหน้า</label>
+                            <input
+                                value={formData.legalPages.cookiePolicy.title}
+                                onChange={(e) => setFormData({ ...formData, legalPages: { ...formData.legalPages, cookiePolicy: { ...formData.legalPages.cookiePolicy, title: e.target.value } } })}
+                                className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-primary/20 outline-none font-medium"
+                            />
+                        </div>
+                        <div className="space-y-2">
+                            <label className="text-xs font-bold text-gray-500 uppercase tracking-widest">เนื้อหา (รองรับ HTML)</label>
+                            <textarea
+                                rows={8}
+                                value={formData.legalPages.cookiePolicy.content}
+                                onChange={(e) => setFormData({ ...formData, legalPages: { ...formData.legalPages, cookiePolicy: { ...formData.legalPages.cookiePolicy, content: e.target.value } } })}
+                                className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-primary/20 outline-none font-mono text-sm resize-y"
+                                placeholder="<h2>คุกกี้คืออะไร?</h2><p>...</p>"
+                            />
+                        </div>
+                    </div>
+
+                    {/* Terms of Use */}
+                    <div className="space-y-4">
+                        <h4 className="font-bold text-gray-700 flex items-center gap-2">
+                            <span className="w-5 h-5 rounded-full text-[9px] font-black flex items-center justify-center text-white" style={{ background: 'var(--primary-color)' }}>3</span>
+                            ข้อตกลงการใช้งาน (Terms of Use)
+                        </h4>
+                        <div className="space-y-2">
+                            <label className="text-xs font-bold text-gray-500 uppercase tracking-widest">หัวข้อหน้า</label>
+                            <input
+                                value={formData.legalPages.termsOfUse.title}
+                                onChange={(e) => setFormData({ ...formData, legalPages: { ...formData.legalPages, termsOfUse: { ...formData.legalPages.termsOfUse, title: e.target.value } } })}
+                                className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-primary/20 outline-none font-medium"
+                            />
+                        </div>
+                        <div className="space-y-2">
+                            <label className="text-xs font-bold text-gray-500 uppercase tracking-widest">เนื้อหา (รองรับ HTML)</label>
+                            <textarea
+                                rows={8}
+                                value={formData.legalPages.termsOfUse.content}
+                                onChange={(e) => setFormData({ ...formData, legalPages: { ...formData.legalPages, termsOfUse: { ...formData.legalPages.termsOfUse, content: e.target.value } } })}
+                                className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-primary/20 outline-none font-mono text-sm resize-y"
+                                placeholder="<h2>1. การใช้งานเว็บไซต์</h2><p>...</p>"
+                            />
+                        </div>
+                    </div>
+                </div>
+
+                {/* Custom 404 Page ─────────────────────────────────────── */}
+                <div className="bg-white p-8 rounded-[2rem] border border-gray-100 shadow-sm">
+                    <div className="flex items-center gap-3 mb-6 pb-4 border-b border-gray-50">
+                        <div className="w-10 h-10 rounded-xl flex items-center justify-center" style={{ background: 'var(--accent-subtle)', color: 'var(--accent-color)' }}>
+                            <HelpCircle size={20} />
+                        </div>
+                        <div>
+                            <h3 className="text-lg font-bold text-gray-800">หน้า 404 (ไม่พบหน้า)</h3>
+                            <p className="text-xs text-gray-400 mt-0.5">ข้อความที่แสดงเมื่อผู้ใช้เข้าหน้าที่ไม่มีอยู่</p>
+                        </div>
+                    </div>
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                        <div className="space-y-2">
+                            <label className="text-sm font-bold text-gray-700">หัวข้อ (Title)</label>
+                            <input
+                                value={formData.notFoundPage.title}
+                                onChange={(e) => setFormData({ ...formData, notFoundPage: { ...formData.notFoundPage, title: e.target.value } })}
+                                className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-primary/20 outline-none font-medium"
+                                placeholder="ไม่พบหน้าที่คุณต้องการ"
+                            />
+                        </div>
+                        <div className="space-y-2">
+                            <label className="text-sm font-bold text-gray-700">คำอธิบาย (Description)</label>
+                            <input
+                                value={formData.notFoundPage.description}
+                                onChange={(e) => setFormData({ ...formData, notFoundPage: { ...formData.notFoundPage, description: e.target.value } })}
+                                className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-primary/20 outline-none font-medium"
+                                placeholder="หน้าที่คุณมองหาอาจถูกย้าย..."
+                            />
+                        </div>
+                        <div className="space-y-2">
+                            <label className="text-sm font-bold text-gray-700">ข้อความปุ่ม (Button Text)</label>
+                            <input
+                                value={formData.notFoundPage.buttonText}
+                                onChange={(e) => setFormData({ ...formData, notFoundPage: { ...formData.notFoundPage, buttonText: e.target.value } })}
+                                className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-primary/20 outline-none font-medium"
+                                placeholder="กลับหน้าแรก"
+                            />
+                        </div>
+                    </div>
+                </div>
+                {/* ── Live Preview Pane ── */}
+                <div
+                    className={`fixed inset-y-0 right-0 z-[100] transition-transform duration-500 ease-in-out ${showPreviewPane ? 'translate-x-0 overflow-visible shadow-[-20px_0_50px_rgba(0,0,0,0.1)]' : 'translate-x-full shadow-none'} w-[375px] sm:w-[480px] bg-white flex flex-col border-l border-gray-200 pointer-events-auto`}
+                >
+                    <div className="flex items-center justify-between p-4 border-b border-gray-100 bg-gray-50/80 backdrop-blur-md z-10">
+                        <div>
+                            <h3 className="font-bold text-gray-800 flex items-center gap-2">
+                                <span className="relative flex h-3 w-3">
+                                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                                    <span className="relative inline-flex rounded-full h-3 w-3 bg-emerald-500"></span>
+                                </span>
+                                โหมดจำลองหน้าจอเว็บ (Live Preview)
+                            </h3>
+                            <p className="text-[10px] text-gray-400 mt-0.5 ml-5">ภาพตัวอย่างแบบเรียลไทม์ (จำลองหน้าแรก)</p>
+                        </div>
+                        <button
+                            type="button"
+                            onClick={() => setShowPreviewPane(false)}
+                            className="p-2 rounded-xl border border-gray-200 bg-white hover:bg-gray-100 transition-colors text-gray-500 hover:text-rose-500 focus:outline-none"
+                            aria-label="Close preview"
+                        >
+                            <X size={16} />
+                        </button>
+                    </div>
+                    <div className="flex-1 bg-gray-100 relative overflow-hidden">
+                        <div className="absolute top-0 right-0 left-0 h-8 bg-gray-200/80 border-b border-gray-300 flex items-center px-4 gap-2 z-10 backdrop-blur">
+                            <div className="flex gap-1.5">
+                                <div className="w-2.5 h-2.5 rounded-full bg-rose-400" />
+                                <div className="w-2.5 h-2.5 rounded-full bg-amber-400" />
+                                <div className="w-2.5 h-2.5 rounded-full bg-emerald-400" />
+                            </div>
+                            <div className="flex-1 ml-4 h-5 bg-white/70 rounded-md text-[9px] flex items-center px-3 text-gray-500 font-mono tracking-tight shadow-inner">
+                                {siteParam === 'pdpa' ? 'pdpa.admincourt.go.th' : 'datagov.admincourt.go.th'}
+                            </div>
+                        </div>
+                        <div className="absolute inset-0 pt-8" style={{ pointerEvents: showPreviewPane ? 'auto' : 'none' }}>
+                            <div className="w-full h-full relative">
+                                {showPreviewPane && (
+                                    <iframe
+                                        id="live-preview-iframe"
+                                        src={`/?site=${siteParam}&preview=true`}
+                                        className="w-full h-full border-none bg-white absolute inset-0"
+                                        title="Live Preview"
+                                        sandbox="allow-scripts allow-same-origin"
+                                    />
+                                )}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                {/* Overlay for small screens when preview is open */}
+                {
+                    showPreviewPane && (
+                        <div
+                            className="fixed inset-0 bg-black/20 backdrop-blur-sm z-[90] sm:hidden"
+                            onClick={() => setShowPreviewPane(false)}
+                        />
+                    )
+                }
+
+                {/* Action Bar */}
+                <div
+                    className="fixed bottom-0 left-0 md:left-72 right-0 p-6 bg-white/80 backdrop-blur-md border-t border-gray-200 flex justify-end gap-3 z-[80] transition-all duration-500"
+                    style={{ paddingRight: showPreviewPane ? 'calc(clamp(375px, 100vw, 480px) + 1.5rem)' : '1.5rem' }}
+                >
+                    <button
+                        type="button"
+                        onClick={() => setShowPreviewPane(!showPreviewPane)}
+                        className={`px-5 py-3 font-bold rounded-xl transition-all flex items-center gap-2 border ${showPreviewPane
+                            ? 'bg-indigo-50 border-indigo-200 text-indigo-600'
+                            : 'bg-white border-gray-200 text-gray-700 hover:bg-gray-50 shadow-sm'
+                            }`}
+                    >
+                        <Globe size={18} />
+                        <span className="hidden sm:inline">{showPreviewPane ? 'ซ่อนตัวอย่าง' : 'ดูตัวอย่างหน้าเว็บ'}</span>
+                    </button>
+
+                    <button
+                        type="button"
+                        className="px-5 py-3 bg-gray-100 text-gray-600 font-bold rounded-xl hover:bg-gray-200 transition-colors hidden sm:block"
+                        onClick={() => window.history.back()}
+                    >
+                        ยกเลิก
+                    </button>
+
+                    <button
+                        type="submit"
+                        disabled={saving}
+                        className="px-6 sm:px-8 py-3 bg-primary text-white font-bold rounded-xl shadow-premium hover:bg-accent transition-all active:scale-95 flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed z-10 relative overflow-hidden"
+                    >
+                        {saving ? <Loader2 className="animate-spin" size={18} /> : <Save size={18} />}
+                        <span className="relative z-10">บันทึกการเปลี่ยนแปลง</span>
+                    </button>
+                </div>
+            </form >
+        </div >
+    );
+}

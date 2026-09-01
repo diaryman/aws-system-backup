@@ -1,0 +1,106 @@
+# ⚖️ Smart Court AI Assistant
+
+ระบบผู้ช่วยอัจฉริยะสำหรับศาลปกครอง (Administrative Court AI Assistant) พัฒนาด้วย **Streamlit** เชื่อมต่อกับ **AWS Bedrock Knowledge Base** และ **ThaiLLM API** เพื่อให้บริการตอบคำถามประชาชนเกี่ยวกับกฎหมายและระเบียบศาลปกครอง
+
+---
+
+## 📂 โครงสร้างระบบ (System Structure)
+
+```
+mybot-thaillm/
+├── main.py                 # ไฟล์หลักสำหรับรันระบบ (Entry Point)
+├── Dockerfile              # Config สำหรับการสร้าง Docker Image
+├── docker-compose.yml      # Config สำหรับการรัน Container (Port 8502)
+├── requirements.txt        # รายชื่อ Library ที่ต้องใข้
+├── .streamlit/
+│   └── secrets.toml        # ไฟล์เก็บ Key และรหัสผ่านสำคัญ (ห้ามเผลออัปโหลดขึ้น Git)
+├── data/
+│   └── court_ai.db         # ฐานข้อมูล SQLite (เก็บประวัติแชท, Feedback)
+├── src/
+│   ├── config.py           # การตั้งค่าระบบ, ชื่อโมเดล, API Endpoints
+│   ├── database.py         # จัดการฐานข้อมูล (SQLite Connection & CRUD)
+│   ├── services.py         # เชื่อมต่อ API (ThaiLLM, AWS Bedrock)
+│   ├── ui.py               # จัดการหน้าจอ UI/UX และธีม (Custom CSS)
+│   └── utils.py            # ฟังก์ชันช่วยเหลือทั่วไป
+```
+
+---
+
+## 🛠️ Tech Stack
+- **Frontend:** Streamlit (Python)
+- **Backend/AI:** AWS Bedrock (Knowledge Base), ThaiLLM API (OpenThaiGPT, Typhoon, etc.)
+- **Database:** SQLite (Embedded)
+- **Deployment:** Docker & Docker Compose
+
+---
+
+## 🚀 วิธีติดตั้งบน Server (Ubuntu) ด้วย Docker
+
+### 1. เตรียม Server
+ตรวจสอบว่าติดตั้ง Docker เรียบร้อยแล้ว
+```bash
+# อัปเดตระบบ
+sudo apt update && sudo apt upgrade -y
+
+# ติดตั้ง Docker
+sudo apt install docker.io docker-compose -y
+
+# เปิดให้ Docker ทำงานอัตโนมัติ
+sudo systemctl enable --now docker
+```
+
+### 2. ติดตั้ง Source Code
+รันคำสั่งเพื่อ Clone โปรเจคลงในโฟลเดอร์ `/home/chatbotthaillm`:
+```bash
+# Clone repository
+sudo git clone https://github.com/diaryman/chatbot-thaillm.git /home/chatbotthaillm
+
+# เข้าไปที่โฟลเดอร์โปรเจค
+cd /home/chatbotthaillm
+```
+
+### 3. ตั้งค่า Secrets
+สร้างไฟล์ `.streamlit/secrets.toml` และใส่ข้อมูลที่จำเป็น:
+```toml
+# .streamlit/secrets.toml
+AWS_ACCESS_KEY = "your_aws_key"
+AWS_SECRET_KEY = "your_aws_secret"
+THAILLM_API_KEY = "your_thaillm_key"
+```
+
+### 4. รันระบบด้วย Docker Compose
+ใช้คำสั่งนี้เพื่อเริ่มทำงาน:
+```bash
+# สร้างและรัน Container (ทำงานเบื้องหลัง)
+sudo docker-compose up -d --build
+```
+
+### 5. เข้าใช้งาน
+เปิด Browser แล้วเข้าไปที่ IP ของ Server:
+- **URL:** `http://<SERVER_IP>:8502`
+- (Port 8502 ตั้งค่าไว้ใน docker-compose.yml เปลี่ยนได้ตามต้องการ)
+
+---
+
+## 🔧 การดูแลรักษา (Maintenance)
+
+### ดู Log ระบบ
+หากต้องการดู Error หรือการทำงานของระบบ:
+```bash
+sudo docker logs -f smart_court_ai
+```
+
+### อัปเดตเวอร์ชันใหม่
+เมื่อมีการแก้โค้ดและต้องการอัปเดต:
+```bash
+# 1. ดึงโค้ดล่าสุด (ถ้าใช้ git)
+git pull
+
+# 2. รีสตาร์ทและ build ใหม่
+sudo docker-compose up -d --build
+```
+
+### การสำรองข้อมูล (Backup)
+ฐานข้อมูลจะอยู่ที่โฟลเดอร์ `data/court_ai.db` บนเครื่อง Server (เพราะเรา Mount Volume ไว้แล้ว)
+- สามารถ Copy ไฟล์นี้ออกมาเพื่อสำรองข้อมูลได้เลย
+- ข้อมูลจะไม่หายแม้ลบ Container ทิ้ง

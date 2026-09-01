@@ -1,0 +1,11 @@
+node_modules
+npm-debug.log
+.git
+.DS_Store
+Dockerfile
+.dockerignore
+docker-compose.yml
+deploy.sh
+test_thai.html
+test_thai.pdf
+test.pdf

@@ -1,0 +1,35 @@
+{
+    "collectionName": "components_shared_heroes",
+    "info": {
+        "displayName": "Hero",
+        "icon": "layer-group",
+        "description": ""
+    },
+    "options": {},
+    "attributes": {
+        "title": {
+            "type": "string",
+            "required": true
+        },
+        "subtitle": {
+            "type": "string"
+        },
+        "description": {
+            "type": "text"
+        },
+        "image": {
+            "type": "media",
+            "multiple": false,
+            "required": false,
+            "allowedTypes": [
+                "images"
+            ]
+        },
+        "cta_text": {
+            "type": "string"
+        },
+        "cta_link": {
+            "type": "string"
+        }
+    }
+}

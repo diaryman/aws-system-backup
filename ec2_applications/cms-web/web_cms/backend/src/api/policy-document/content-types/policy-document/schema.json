@@ -1,0 +1,55 @@
+{
+    "kind": "collectionType",
+    "collectionName": "policy_documents",
+    "info": {
+        "singularName": "policy-document",
+        "pluralName": "policy-documents",
+        "displayName": "Policy Document",
+        "description": "PDF Documents"
+    },
+    "options": {
+        "draftAndPublish": true
+    },
+    "attributes": {
+        "title": {
+            "type": "string",
+            "required": true
+        },
+        "description": {
+            "type": "text"
+        },
+        "file": {
+            "type": "media",
+            "multiple": false,
+            "required": true,
+            "allowedTypes": [
+                "files"
+            ]
+        },
+        "coverImage": {
+            "type": "media",
+            "multiple": false,
+            "required": false,
+            "allowedTypes": [
+                "images"
+            ]
+        },
+        "category": {
+            "type": "string",
+            "required": true
+        },
+        "year": {
+            "type": "integer",
+            "required": true
+        },
+        "domain": {
+            "type": "string"
+        },
+        "seoTitle": {
+            "type": "string"
+        },
+        "seoDescription": {
+            "type": "text"
+        }
+    }
+}

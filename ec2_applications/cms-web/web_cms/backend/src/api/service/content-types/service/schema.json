@@ -1,0 +1,52 @@
+{
+    "kind": "collectionType",
+    "collectionName": "services",
+    "info": {
+        "singularName": "service",
+        "pluralName": "services",
+        "displayName": "Services",
+        "description": "Services and Downloads section content"
+    },
+    "options": {
+        "draftAndPublish": true
+    },
+    "pluginOptions": {},
+    "attributes": {
+        "title": {
+            "type": "string",
+            "required": true
+        },
+        "description": {
+            "type": "text"
+        },
+        "icon": {
+            "type": "string",
+            "default": "Download"
+        },
+        "link": {
+            "type": "string"
+        },
+        "category": {
+            "type": "enumeration",
+            "enum": [
+                "download",
+                "service",
+                "tool"
+            ],
+            "default": "service"
+        },
+        "domain": {
+            "type": "string",
+            "required": true,
+            "default": "localhost:3000"
+        },
+        "order": {
+            "type": "integer",
+            "default": 0
+        },
+        "isActive": {
+            "type": "boolean",
+            "default": true
+        }
+    }
+}

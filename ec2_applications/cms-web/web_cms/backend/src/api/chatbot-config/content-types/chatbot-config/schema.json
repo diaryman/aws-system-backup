@@ -1,0 +1,131 @@
+{
+    "kind": "collectionType",
+    "collectionName": "chatbot_configs",
+    "info": {
+        "singularName": "chatbot-config",
+        "pluralName": "chatbot-configs",
+        "displayName": "Chatbot Config",
+        "description": "Configuration for AI Chatbot"
+    },
+    "options": {
+        "draftAndPublish": false
+    },
+    "attributes": {
+        "domain": {
+            "type": "string",
+            "required": true,
+            "unique": true
+        },
+        "isEnabled": {
+            "type": "boolean",
+            "default": true
+        },
+        "provider": {
+            "type": "enumeration",
+            "enum": [
+                "gemini",
+                "openai",
+                "ollama",
+                "openthaigpt"
+            ],
+            "default": "gemini"
+        },
+        "apiKey": {
+            "type": "string"
+        },
+        "modelName": {
+            "type": "string",
+            "default": "gemini-1.5-flash"
+        },
+        "systemPrompt": {
+            "type": "text",
+            "default": "คุณคือผู้ช่วยอัจฉริยะของหน่วยงาน คุณมีหน้าที่ตอบคำถามโดยใช้ข้อมูลจากเอกสารนโยบายและข่าวสารของหน่วยงาน"
+        },
+        "welcomeMessage": {
+            "type": "string",
+            "default": "สวัสดีครับ มีอะไรให้ผมช่วยไหมครับ?"
+        },
+        "temperature": {
+            "type": "decimal",
+            "default": 0.7
+        },
+        "botName": {
+            "type": "string",
+            "default": "AI Assistant"
+        },
+        "suggestedQuestions": {
+            "type": "json"
+        },
+        "ragInstructions": {
+            "type": "text",
+            "default": "เมื่อได้รับข้อมูลอ้างอิงจากฐานความรู้ ให้ใช้ข้อมูลนั้นเป็นหลักในการตอบ พร้อมอ้างอิงแหล่งที่มา หากไม่มีข้อมูลอ้างอิงที่เกี่ยวข้อง ให้ตอบตามความรู้ทั่วไปและแจ้งให้ผู้ใช้ทราบ"
+        },
+        "fallbackMessage": {
+            "type": "text",
+            "default": "ขออภัยครับ ผมไม่มีข้อมูลเพียงพอสำหรับคำถามนี้ กรุณาติดต่อเจ้าหน้าที่โดยตรง"
+        },
+        "restrictedTopics": {
+            "type": "json"
+        },
+        "maxTokens": {
+            "type": "integer",
+            "default": 1024
+        },
+        "topP": {
+            "type": "decimal",
+            "default": 0.9
+        },
+        "historyLength": {
+            "type": "integer",
+            "default": 10
+        },
+        "responseLanguage": {
+            "type": "enumeration",
+            "enum": [
+                "thai",
+                "english",
+                "auto"
+            ],
+            "default": "thai"
+        },
+        "responseFormat": {
+            "type": "enumeration",
+            "enum": [
+                "concise",
+                "detailed",
+                "bullet_points"
+            ],
+            "default": "concise"
+        },
+        "showSources": {
+            "type": "boolean",
+            "default": true
+        },
+        "promptTemplate": {
+            "type": "enumeration",
+            "enum": [
+                "custom",
+                "legal_expert",
+                "helpdesk",
+                "faq_bot",
+                "friendly_guide"
+            ],
+            "default": "custom"
+        },
+        "widgetPosition": {
+            "type": "enumeration",
+            "enum": [
+                "bottom-right",
+                "bottom-left"
+            ],
+            "default": "bottom-right"
+        },
+        "widgetColor": {
+            "type": "string",
+            "default": ""
+        },
+        "avatarUrl": {
+            "type": "string"
+        }
+    }
+}

@@ -1,0 +1,57 @@
+{
+    "kind": "collectionType",
+    "collectionName": "newsletter_subscribers",
+    "info": {
+        "singularName": "newsletter-subscriber",
+        "pluralName": "newsletter-subscribers",
+        "displayName": "Newsletter Subscriber",
+        "description": "ผู้สมัครรับข่าวสาร (Newsletter)"
+    },
+    "options": {
+        "draftAndPublish": false
+    },
+    "attributes": {
+        "email": {
+            "type": "email",
+            "required": true,
+            "unique": true
+        },
+        "name": {
+            "type": "string"
+        },
+        "domain": {
+            "type": "string",
+            "required": true
+        },
+        "isActive": {
+            "type": "boolean",
+            "default": true
+        },
+        "subscribedAt": {
+            "type": "datetime"
+        },
+        "unsubscribedAt": {
+            "type": "datetime"
+        },
+        "source": {
+            "type": "enumeration",
+            "enum": [
+                "website",
+                "admin",
+                "import"
+            ],
+            "default": "website"
+        },
+        "tags": {
+            "type": "json"
+        },
+        "unsubscribeToken": {
+            "type": "string",
+            "unique": true
+        },
+        "isRead": {
+            "type": "boolean",
+            "default": false
+        }
+    }
+}

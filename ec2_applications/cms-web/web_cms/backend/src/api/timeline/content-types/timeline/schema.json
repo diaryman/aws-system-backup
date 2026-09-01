@@ -1,0 +1,35 @@
+{
+    "kind": "collectionType",
+    "collectionName": "timelines",
+    "info": {
+        "singularName": "timeline",
+        "pluralName": "timelines",
+        "displayName": "Timeline",
+        "description": "Roadmap timeline items for PDPA or DataGOV"
+    },
+    "options": {
+        "draftAndPublish": true
+    },
+    "attributes": {
+        "year": {
+            "type": "string",
+            "required": true
+        },
+        "title": {
+            "type": "string",
+            "required": true
+        },
+        "description": {
+            "type": "text"
+        },
+        "domain": {
+            "type": "string",
+            "required": true,
+            "default": "pdpa.localhost"
+        },
+        "order": {
+            "type": "integer",
+            "default": 0
+        }
+    }
+}

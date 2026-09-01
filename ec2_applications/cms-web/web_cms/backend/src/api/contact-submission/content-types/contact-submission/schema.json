@@ -1,0 +1,54 @@
+{
+    "kind": "collectionType",
+    "collectionName": "contact_submissions",
+    "info": {
+        "singularName": "contact-submission",
+        "pluralName": "contact-submissions",
+        "displayName": "Contact Submission",
+        "description": "Store contact form submissions."
+    },
+    "options": {
+        "draftAndPublish": false
+    },
+    "pluginOptions": {},
+    "attributes": {
+        "name": {
+            "type": "string",
+            "required": true
+        },
+        "email": {
+            "type": "email",
+            "required": true
+        },
+        "subject": {
+            "type": "string"
+        },
+        "message": {
+            "type": "text",
+            "required": true
+        },
+        "category": {
+            "type": "enumeration",
+            "enum": [
+                "General Inquiry",
+                "Data Request",
+                "Complaint",
+                "DPO Contact"
+            ],
+            "default": "General Inquiry"
+        },
+        "status": {
+            "type": "enumeration",
+            "enum": [
+                "New",
+                "In Progress",
+                "Resolved",
+                "Archive"
+            ],
+            "default": "New"
+        },
+        "domain": {
+            "type": "string"
+        }
+    }
+}

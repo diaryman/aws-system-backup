@@ -1,0 +1,12 @@
+streamlit
+boto3
+openai
+google-generativeai
+gspread
+oauth2client
+pandas
+plotly
+reportlab
+tabulate
+python-docx
+openpyxl

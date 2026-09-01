@@ -1,0 +1,81 @@
+
+> frontend@0.1.0 dev:pdpa
+> NEXT_DIST_DIR=.next_pdpa next dev -p 3004
+
+⚠ Warning: Next.js inferred your workspace root, but it may not be correct.
+ We detected multiple lockfiles and selected the directory of /Users/teepakorn_s/package-lock.json as the root directory.
+ To silence this warning, set `turbopack.root` in your Next.js config, or consider removing one of the lockfiles if it's not needed.
+   See https://nextjs.org/docs/app/api-reference/config/next-config-js/turbopack#root-directory for more information.
+ Detected additional lockfiles: 
+   * /Users/teepakorn_s/Desktop/my_cms/frontend/package-lock.json
+
+▲ Next.js 16.1.6 (Turbopack)
+- Local:         http://localhost:3004
+- Network:       http://192.168.10.185:3004
+- Environments: .env.local
+- Experiments (use with caution):
+  · optimizePackageImports
+  · serverActions
+
+✓ Starting...
+⚠ The "middleware" file convention is deprecated. Please use "proxy" instead. Learn more: https://nextjs.org/docs/messages/middleware-to-proxy
+✓ Ready in 446ms
+ GET /manifest.webmanifest 200 in 69ms (compile: 56ms, proxy.ts: 2ms, render: 11ms)
+ GET /admin/site-config?site=pdpa 200 in 164ms (compile: 4ms, proxy.ts: 5ms, render: 155ms)
+ POST /admin/site-config?site=pdpa 200 in 48ms (compile: 19ms, proxy.ts: 5ms, render: 24ms)
+ GET /icon-192.png 404 in 215ms (compile: 126ms, proxy.ts: 4ms, render: 85ms)
+ GET /manifest.webmanifest 200 in 7ms (compile: 1876µs, proxy.ts: 1625µs, render: 3ms)
+ GET / 200 in 335ms (compile: 64ms, proxy.ts: 6ms, render: 265ms)
+ GET /icon-192.png 404 in 68ms (compile: 14ms, proxy.ts: 2ms, render: 51ms)
+ GET /admin/site-config?site=pdpa 200 in 457ms (compile: 174ms, proxy.ts: 3ms, render: 279ms)
+ GET /manifest.webmanifest 200 in 48ms (compile: 26ms, proxy.ts: 7ms, render: 15ms)
+ GET / 200 in 566ms (compile: 9ms, proxy.ts: 4ms, render: 553ms)
+ GET /manifest.webmanifest 200 in 18ms (compile: 2ms, proxy.ts: 5ms, render: 10ms)
+ GET /icon-192.png 404 in 269ms (compile: 19ms, proxy.ts: 6ms, render: 244ms)
+ GET /icon-192.png 404 in 135ms (compile: 18ms, proxy.ts: 5ms, render: 112ms)
+ GET /manifest.webmanifest 200 in 18ms (compile: 10ms, proxy.ts: 4ms, render: 4ms)
+ GET /manifest.webmanifest 200 in 51ms (compile: 21ms, proxy.ts: 1518µs, render: 29ms)
+ GET /admin/site-config?site=pdpa 200 in 2.1s (compile: 1045ms, proxy.ts: 6ms, render: 1022ms)
+ GET / 200 in 2.1s (compile: 797ms, proxy.ts: 6ms, render: 1308ms)
+ POST /admin/site-config?site=pdpa 200 in 268ms (compile: 203ms, proxy.ts: 10ms, render: 55ms)
+ GET /icon-192.png 404 in 1004ms (compile: 133ms, proxy.ts: 6ms, render: 865ms)
+ GET /icon-192.png 404 in 401ms (compile: 69ms, proxy.ts: 26ms, render: 305ms)
+✓ Compiled in 5.6s
+✓ Compiled in 43ms
+✓ Compiled in 890ms
+ GET /admin/site-config?site=pdpa 200 in 161ms (compile: 4ms, proxy.ts: 8ms, render: 149ms)
+ GET /admin/site-config?site=pdpa 200 in 924ms (compile: 465ms, proxy.ts: 16ms, render: 443ms)
+ GET /manifest.webmanifest 200 in 23ms (compile: 7ms, proxy.ts: 3ms, render: 13ms)
+ GET /admin/site-config?site=pdpa 200 in 181ms (compile: 13ms, proxy.ts: 10ms, render: 159ms)
+ GET / 200 in 1037ms (compile: 99ms, proxy.ts: 17ms, render: 921ms)
+ GET /manifest.webmanifest 200 in 26ms (compile: 16ms, proxy.ts: 4ms, render: 6ms)
+ GET /icon-192.png 404 in 386ms (compile: 90ms, proxy.ts: 4ms, render: 292ms)
+ POST /admin/site-config?site=pdpa 200 in 65ms (compile: 35ms, proxy.ts: 1763µs, render: 29ms)
+ GET /icon-192.png 404 in 86ms (compile: 21ms, proxy.ts: 2ms, render: 63ms)
+ POST /admin/site-config?site=pdpa 200 in 45ms (compile: 6ms, proxy.ts: 9ms, render: 30ms)
+ POST /admin/site-config?site=pdpa 200 in 77ms (compile: 9ms, proxy.ts: 20ms, render: 47ms)
+ POST /admin/site-config?site=pdpa 200 in 47ms (compile: 9ms, proxy.ts: 5ms, render: 32ms)
+ POST /admin/site-config?site=pdpa 200 in 39ms (compile: 6ms, proxy.ts: 5ms, render: 28ms)
+ POST /admin/site-config?site=pdpa 200 in 36ms (compile: 4ms, proxy.ts: 5ms, render: 27ms)
+✓ Compiled in 82ms
+ POST /admin/site-config?site=pdpa 200 in 81ms (compile: 68ms, proxy.ts: 3ms, render: 11ms)
+✓ Compiled in 708ms
+ GET /admin/site-config?site=pdpa 200 in 926ms (compile: 293ms, proxy.ts: 11ms, render: 622ms)
+ GET /manifest.webmanifest 200 in 18ms (compile: 7ms, proxy.ts: 4ms, render: 7ms)
+ GET /admin/site-config?site=pdpa 200 in 351ms (compile: 45ms, proxy.ts: 177ms, render: 130ms)
+ GET / 200 in 1018ms (compile: 19ms, proxy.ts: 12ms, render: 988ms)
+ GET /manifest.webmanifest 200 in 30ms (compile: 11ms, proxy.ts: 8ms, render: 12ms)
+ GET /icon-192.png 404 in 130ms (compile: 31ms, proxy.ts: 6ms, render: 94ms)
+ POST /admin/site-config?site=pdpa 200 in 48ms (compile: 31ms, proxy.ts: 5ms, render: 12ms)
+ GET /icon-192.png 404 in 125ms (compile: 47ms, proxy.ts: 6ms, render: 72ms)
+✓ Compiled in 565ms
+✓ Compiled in 256ms
+✓ Compiled in 77ms
+✓ Compiled in 39ms
+✓ Compiled in 162ms
+ GET /admin/site-config?site=pdpa 200 in 404ms (compile: 67ms, proxy.ts: 150ms, render: 187ms)
+ GET / 200 in 875ms (compile: 133ms, proxy.ts: 16ms, render: 726ms)
+ POST /admin/site-config?site=pdpa 200 in 15ms (compile: 6ms, proxy.ts: 2ms, render: 7ms)
+ GET /icon-192.png 404 in 118ms (compile: 50ms, proxy.ts: 4ms, render: 65ms)
+ GET /icon-192.png 404 in 44ms (compile: 3ms, proxy.ts: 1625µs, render: 39ms)
+✓ Compiled in 59ms

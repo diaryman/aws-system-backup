@@ -1,0 +1,21 @@
+# Security & Secrets
+*.pem
+*.key
+*.id_rsa*
+*.id_ed25519*
+.aws/credentials
+
+# System & OS
+.DS_Store
+Thumbs.db
+
+# Dependencies & Build artifacts
+node_modules/
+.venv/
+venv/
+__pycache__/
+*.pyc
+.cache/
+dist/
+build/
+.next/

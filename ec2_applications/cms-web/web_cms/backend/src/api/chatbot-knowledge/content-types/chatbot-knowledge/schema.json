@@ -1,0 +1,64 @@
+{
+    "kind": "collectionType",
+    "collectionName": "chatbot_knowledges",
+    "info": {
+        "singularName": "chatbot-knowledge",
+        "pluralName": "chatbot-knowledges",
+        "displayName": "Chatbot Knowledge",
+        "description": "Knowledge base documents for RAG chatbot"
+    },
+    "options": {
+        "draftAndPublish": false
+    },
+    "attributes": {
+        "title": {
+            "type": "string",
+            "required": true
+        },
+        "domain": {
+            "type": "string",
+            "required": true,
+            "default": "localhost"
+        },
+        "isActive": {
+            "type": "boolean",
+            "default": true
+        },
+        "file": {
+            "type": "media",
+            "multiple": false,
+            "allowedTypes": [
+                "files"
+            ]
+        },
+        "content": {
+            "type": "text"
+        },
+        "chunks": {
+            "type": "json"
+        },
+        "chunkCount": {
+            "type": "integer",
+            "default": 0
+        },
+        "status": {
+            "type": "enumeration",
+            "enum": [
+                "pending",
+                "processing",
+                "ready",
+                "error"
+            ],
+            "default": "pending"
+        },
+        "fileType": {
+            "type": "string"
+        },
+        "fileSize": {
+            "type": "integer"
+        },
+        "metadata": {
+            "type": "json"
+        }
+    }
+}

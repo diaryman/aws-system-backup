@@ -1,0 +1,47 @@
+{
+    "kind": "collectionType",
+    "collectionName": "audit_logs",
+    "info": {
+        "singularName": "audit-log",
+        "pluralName": "audit-logs",
+        "displayName": "Audit Log",
+        "description": "Logs for tracking administrative actions"
+    },
+    "options": {
+        "draftAndPublish": false
+    },
+    "attributes": {
+        "action": {
+            "type": "enumeration",
+            "enum": [
+                "CREATE",
+                "UPDATE",
+                "DELETE"
+            ],
+            "required": true
+        },
+        "contentType": {
+            "type": "string",
+            "required": true
+        },
+        "entityId": {
+            "type": "string"
+        },
+        "entityTitle": {
+            "type": "string"
+        },
+        "details": {
+            "type": "json"
+        },
+        "userEmail": {
+            "type": "string"
+        },
+        "domain": {
+            "type": "string"
+        },
+        "isRead": {
+            "type": "boolean",
+            "default": false
+        }
+    }
+}
